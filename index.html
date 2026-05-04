@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juegos Educativos - Sumas Rápidas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app">
+
+        <!-- PANTALLA 1: BIENVENIDA -->
+        <section id="screen-welcome" class="screen active">
+            <div class="card">
+                <h1 class="title">🎯 Sumas Rápidas</h1>
+                <p class="subtitle">¡Resuelve 60 sumas en menos de 2 minutos!</p>
+
+                <div class="rules">
+                    <div class="rule">⏱️ Tiempo: <strong>2 minutos</strong></div>
+                    <div class="rule">➕ Sumas: <strong>60 retos</strong></div>
+                    <div class="rule">🔢 Resultados hasta <strong>10</strong></div>
+                </div>
+
+                <label for="player-name" class="label">¿Cómo te llamas?</label>
+                <input
+                    type="text"
+                    id="player-name"
+                    class="name-input"
+                    placeholder="Escribe tu nombre"
+                    maxlength="20"
+                    autocomplete="off"
+                />
+
+                <button id="btn-start" class="btn btn-primary">
+                    ¡Empezar! 🚀
+                </button>
+            </div>
+        </section>
+
+        <!-- PANTALLA 2: JUEGO -->
+        <section id="screen-game" class="screen">
+            <header class="game-header">
+                <div class="hud">
+                    <div class="hud-item">
+                        <span class="hud-label">Jugador</span>
+                        <span id="hud-name" class="hud-value">—</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">Acertadas</span>
+                        <span id="hud-score" class="hud-value">0 / 60</span>
+                    </div>
+                    <div class="hud-item">
+                        <span class="hud-label">Tiempo</span>
+                        <span id="hud-timer" class="hud-value timer">02:00</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </header>
+
+            <main class="question-area">
+                <div id="feedback" class="feedback"></div>
+                <div class="question" aria-live="polite">
+                    <span id="num-a" class="num">0</span>
+                    <span class="op">+</span>
+                    <span id="num-b" class="num">0</span>
+                    <span class="op">=</span>
+                    <span id="answer-display" class="num answer-slot">?</span>
+                </div>
+
+                <div class="keypad" id="keypad">
+                    <!-- generado por JS -->
+                </div>
+
+                <button id="btn-clear" class="btn btn-secondary btn-clear">Borrar ⌫</button>
+            </main>
+        </section>
+
+        <!-- PANTALLA 3: RESULTADO -->
+        <section id="screen-result" class="screen">
+            <div class="card result-card">
+                <h1 id="result-title" class="title">🎉</h1>
+                <p id="result-message" class="result-message"></p>
+
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-label">Acertadas</span>
+                        <span id="stat-correct" class="stat-value">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Tiempo usado</span>
+                        <span id="stat-time" class="stat-value">0s</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Precisión</span>
+                        <span id="stat-accuracy" class="stat-value">0%</span>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button id="btn-retry" class="btn btn-primary">Intentar otra vez 🔁</button>
+                    <button id="btn-home" class="btn btn-secondary">Cambiar jugador 👤</button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <canvas id="confetti" class="confetti"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>
