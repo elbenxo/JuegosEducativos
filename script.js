@@ -29,14 +29,14 @@
     };
 
     // === Generador de sumas ===
-    // Sumandos del 1 al 9, resultado <= 10. Para evitar sesgar hacia el 10,
+    // Sumandos del 0 al 9, resultado entre 1 y 10. Para evitar sesgo,
     // elegimos primero el resultado uniformemente y luego un sumando válido.
     function generateQuestion(prev) {
         let a, b, result;
         do {
-            result = 2 + Math.floor(Math.random() * 9);     // 2..10
-            const aMin = Math.max(1, result - 9);
-            const aMax = Math.min(9, result - 1);
+            result = 1 + Math.floor(Math.random() * MAX_RESULT); // 1..10
+            const aMin = Math.max(0, result - 9);
+            const aMax = Math.min(9, result);
             a = aMin + Math.floor(Math.random() * (aMax - aMin + 1));
             b = result - a;
         } while (prev && prev.a === a && prev.b === b);
