@@ -176,6 +176,64 @@
         { word: 'nueve', upper: false }, { word: 'diez', upper: false },
     ];
 
+    // === Oraciones para el juego de Inglés ===
+    // Cada oración tiene dos huecos (___) y dos palabras correctas en orden.
+    // El "pool" contiene las dos correctas + cuatro distractores plausibles.
+    const ENGLISH_SENTENCES = [
+        // Statements
+        { text: 'I ___ a ___.', correct: ['have', 'dog'],
+          pool: ['have', 'are', 'go', 'dog', 'book', 'happy'] },
+        { text: 'She ___ a ___.', correct: ['reads', 'book'],
+          pool: ['reads', 'is', 'has', 'book', 'apple', 'red'] },
+        { text: 'He ___ to ___.', correct: ['goes', 'school'],
+          pool: ['goes', 'is', 'has', 'school', 'apple', 'fast'] },
+        { text: 'We ___ in the ___.', correct: ['play', 'park'],
+          pool: ['play', 'is', 'are', 'park', 'cat', 'red'] },
+        { text: 'They ___ very ___.', correct: ['are', 'happy'],
+          pool: ['are', 'is', 'do', 'happy', 'cat', 'school'] },
+        { text: 'The ___ is ___.', correct: ['cat', 'big'],
+          pool: ['cat', 'school', 'and', 'big', 'eat', 'go'] },
+        { text: 'My ___ is ___.', correct: ['mom', 'nice'],
+          pool: ['mom', 'eat', 'see', 'nice', 'red', 'do'] },
+        { text: 'I like ___ and ___.', correct: ['cats', 'dogs'],
+          pool: ['cats', 'eats', 'big', 'dogs', 'fast', 'is'] },
+        { text: 'The ___ ___ fast.', correct: ['dog', 'runs'],
+          pool: ['dog', 'is', 'and', 'runs', 'big', 'red'] },
+        { text: 'I can ___ a ___.', correct: ['ride', 'bike'],
+          pool: ['ride', 'is', 'are', 'bike', 'school', 'happy'] },
+        { text: 'She ___ red ___.', correct: ['eats', 'apples'],
+          pool: ['eats', 'is', 'and', 'apples', 'big', 'cat'] },
+        { text: 'We ___ very ___.', correct: ['are', 'tired'],
+          pool: ['are', 'is', 'do', 'tired', 'cat', 'go'] },
+        { text: 'My friend has a ___ ___.', correct: ['blue', 'car'],
+          pool: ['blue', 'eat', 'go', 'car', 'happy', 'is'] },
+        { text: 'The boy is ___ and ___.', correct: ['tall', 'strong'],
+          pool: ['tall', 'is', 'and', 'strong', 'eat', 'go'] },
+        { text: 'Birds ___ in the ___.', correct: ['fly', 'sky'],
+          pool: ['fly', 'is', 'are', 'sky', 'school', 'red'] },
+        // Questions
+        { text: 'Do you ___ a ___?', correct: ['have', 'pet'],
+          pool: ['have', 'is', 'do', 'pet', 'go', 'red'] },
+        { text: 'Can you ___ the ___?', correct: ['see', 'cat'],
+          pool: ['see', 'is', 'are', 'cat', 'school', 'happy'] },
+        { text: 'Is the ___ ___?', correct: ['apple', 'red'],
+          pool: ['apple', 'is', 'do', 'red', 'go', 'see'] },
+        { text: 'Where is ___ ___?', correct: ['my', 'book'],
+          pool: ['my', 'is', 'are', 'book', 'happy', 'go'] },
+        { text: 'Are you ___ or ___?', correct: ['happy', 'sad'],
+          pool: ['happy', 'is', 'are', 'sad', 'cat', 'go'] },
+        { text: 'What is ___ ___?', correct: ['your', 'name'],
+          pool: ['your', 'is', 'and', 'name', 'go', 'red'] },
+        { text: 'Does she ___ a ___?', correct: ['like', 'cat'],
+          pool: ['like', 'is', 'do', 'cat', 'school', 'red'] },
+        { text: 'When do you ___ to ___?', correct: ['go', 'school'],
+          pool: ['go', 'is', 'and', 'school', 'cat', 'red'] },
+        { text: 'Why is the ___ ___?', correct: ['sky', 'blue'],
+          pool: ['sky', 'is', 'are', 'blue', 'red', 'go'] },
+        { text: 'Are the ___ ___?', correct: ['kids', 'playing'],
+          pool: ['kids', 'is', 'are', 'playing', 'red', 'cat'] },
+    ];
+
     // === Catálogo de juegos ===
     const GAMES = {
         sumas: {
@@ -288,6 +346,46 @@
                 return q.result === 'upper' ? q.upper : q.lower;
             },
         },
+
+        english: {
+            id: 'english',
+            title: 'Fill the sentence',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'words',
+            generate(prev) {
+                let pick;
+                do {
+                    pick = ENGLISH_SENTENCES[Math.floor(Math.random() * ENGLISH_SENTENCES.length)];
+                } while (prev && prev.text === pick.text);
+                return {
+                    text: pick.text,
+                    pool: shuffle(pick.pool.slice()),
+                    result: pick.correct.slice(),  // array → modo multi-pick
+                };
+            },
+            renderQuestion(q, container, picks) {
+                picks = picks || [];
+                let i = 0;
+                const html = q.text.replace(/___/g, () => {
+                    const idx = i++;
+                    const p = picks[idx];
+                    if (p === undefined) {
+                        const cls = idx === picks.length ? 'en-blank en-blank-active' : 'en-blank';
+                        return `<span class="${cls}">_____</span>`;
+                    }
+                    return `<span class="en-blank en-blank-filled">${escapeHtml(p)}</span>`;
+                });
+                container.innerHTML = `<div class="en-sentence">${html}</div>`;
+            },
+            getKeypadValues(q) {
+                return q.pool.map((w) => ({ label: w, value: w }));
+            },
+            formatAnswer(q) {
+                let i = 0;
+                return q.text.replace(/___/g, () => q.result[i++]);
+            },
+        },
     };
 
     function range(from, to) {
@@ -319,8 +417,9 @@
         timeLeft: 0,
         timerId: null,
         currentQuestion: null,
+        currentPicks: [],   // para juegos con respuesta de varios picks
         finished: false,
-        locked: false, // bloquea entrada mientras se muestra feedback
+        locked: false,      // bloquea entrada mientras se muestra feedback
     };
 
     const $ = (id) => document.getElementById(id);
@@ -408,19 +507,36 @@
             return;
         }
         state.currentQuestion = state.game.generate(state.currentQuestion);
-        state.game.renderQuestion(state.currentQuestion, $('question'));
+        state.currentPicks = [];
+        state.game.renderQuestion(state.currentQuestion, $('question'), state.currentPicks);
         buildKeypad(state.game, state.currentQuestion);
         state.locked = false;
     }
 
-    // Una respuesta cualquiera. Si acierta, suma punto y avanza pronto.
-    // Si falla, NO permite reintentar la misma operación: muestra brevemente
-    // la respuesta correcta y pasa a la siguiente pregunta.
+    // Respuesta del jugador. Para juegos con respuesta única (sumas, multi,
+    // lengua) se comprueba al instante. Para juegos con varios picks (inglés,
+    // result es un array), se acumulan los picks y se comprueba cuando se
+    // han elegido todos. Si falla, muestra la respuesta correcta y avanza.
     function onAnswer(value) {
         if (state.finished || state.locked || !state.currentQuestion) return;
+        const target = state.currentQuestion.result;
+        const isMulti = Array.isArray(target);
+
+        if (isMulti) {
+            state.currentPicks.push(value);
+            state.game.renderQuestion(state.currentQuestion, $('question'), state.currentPicks);
+            if (state.currentPicks.length < target.length) return;
+            const allOk = state.currentPicks.every((p, i) => p === target[i]);
+            finishCheck(allOk);
+            return;
+        }
+
+        const ok = value === target || String(value) === String(target);
+        finishCheck(ok);
+    }
+
+    function finishCheck(correct) {
         state.locked = true;
-        const correct = value === state.currentQuestion.result
-            || String(value) === String(state.currentQuestion.result);
         const fb = $('feedback');
         if (correct) {
             state.correct++;
@@ -439,7 +555,7 @@
                 fb.className = 'feedback';
                 state.currentIndex++;
                 nextQuestion();
-            }, 450);
+            }, 500);
         }
     }
 
