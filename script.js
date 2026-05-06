@@ -3,7 +3,7 @@
 
     // === Catálogo de juegos ===
     // Cada juego define su generador, operador, total de retos, tiempo límite
-    // y cómo se introduce la respuesta (single = un toque; multi = teclear).
+    // y los valores a mostrar en el teclado para cada pregunta.
     const GAMES = {
         sumas: {
             id: 'sumas',
@@ -11,8 +11,7 @@
             operator: '+',
             total: 60,
             timeLimit: 120,
-            inputMode: 'single',          // teclas 0..10, cada tecla = respuesta
-            keypadValues: range(0, 10),
+            keypadClass: 'cols-4',          // teclado fijo 0..10
             generate(prev) {
                 let a, b, result;
                 do {
@@ -24,6 +23,7 @@
                 } while (prev && prev.a === a && prev.b === b);
                 return { a, b, result };
             },
+            getKeypadValues() { return range(0, 10); },
         },
         multi: {
             id: 'multi',
@@ -31,8 +31,7 @@
             operator: '×',
             total: 40,
             timeLimit: 120,
-            inputMode: 'multi',           // teclado 0..9, se teclea la respuesta
-            keypadValues: range(1, 9).concat(0),
+            keypadClass: 'options',         // 4 opciones por pregunta
             generate(prev) {
                 let a, b, result;
                 do {
@@ -42,6 +41,24 @@
                 } while (prev && prev.a === a && prev.b === b);
                 return { a, b, result };
             },
+            // 4 opciones: la correcta + 3 distractores cercanos plausibles
+            // (productos de pares de factores próximos), barajadas.
+            getKeypadValues(q) {
+                const correct = q.result;
+                const candidates = new Set();
+                for (let da = -2; da <= 2; da++) {
+                    for (let db = -2; db <= 2; db++) {
+                        if (da === 0 && db === 0) continue;
+                        const a = q.a + da, b = q.b + db;
+                        if (a >= 1 && a <= 9 && b >= 1 && b <= 9) {
+                            const r = a * b;
+                            if (r !== correct) candidates.add(r);
+                        }
+                    }
+                }
+                const distractors = shuffle(Array.from(candidates)).slice(0, 3);
+                return shuffle([correct, ...distractors]);
+            },
         },
     };
 
@@ -49,6 +66,14 @@
         const out = [];
         for (let i = from; i <= to; i++) out.push(i);
         return out;
+    }
+
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
     }
 
     // === Estado ===
@@ -77,13 +102,14 @@
         screens[name].classList.add('active');
     }
 
-    // === Construcción del teclado según el juego ===
-    function buildKeypad(game) {
+    // === Construcción del teclado según el juego y la pregunta ===
+    // Cada botón es una respuesta completa: al pulsarlo se comprueba.
+    function buildKeypad(game, question) {
         const keypad = $('keypad');
         keypad.innerHTML = '';
-        keypad.classList.toggle('digits', game.inputMode === 'multi');
-
-        game.keypadValues.forEach((n) => {
+        keypad.className = 'keypad ' + (game.keypadClass || '');
+        const values = game.getKeypadValues(question);
+        values.forEach((n) => {
             const btn = document.createElement('button');
             btn.className = 'key';
             btn.type = 'button';
@@ -91,9 +117,6 @@
             btn.addEventListener('click', () => onKeyPress(n));
             keypad.appendChild(btn);
         });
-
-        // El botón "Listo ✓" sólo aparece en modo multi-dígito
-        $('btn-ok').hidden = game.inputMode !== 'multi';
     }
 
     // === Inicio del juego ===
@@ -117,7 +140,6 @@
 
         $('hud-name').textContent = state.playerName;
         $('op').textContent = state.game.operator;
-        buildKeypad(state.game);
         updateHUD();
         nextQuestion();
         startTimer();
@@ -152,6 +174,7 @@
         state.currentInput = '';
         $('num-a').textContent = state.currentQuestion.a;
         $('num-b').textContent = state.currentQuestion.b;
+        buildKeypad(state.game, state.currentQuestion);
         renderAnswer();
     }
 
@@ -166,54 +189,25 @@
         }
     }
 
-    // Una pulsación: en modo single equivale a una respuesta completa,
-    // en modo multi se acumulan dígitos y se auto-comprueba al alcanzar la
-    // longitud del resultado correcto.
+    // Cada pulsación de tecla es una respuesta completa.
     function onKeyPress(value) {
         if (state.finished) return;
-        const game = state.game;
-        if (game.inputMode === 'single') {
-            state.currentInput = String(value);
-            renderAnswer();
-            checkAnswer();
-            return;
-        }
-        // multi
-        const next = state.currentInput + String(value);
-        if (next.length > 3) return;                 // los resultados llegan a 81
-        state.currentInput = next;
+        state.currentInput = String(value);
         renderAnswer();
-        const targetLen = String(state.currentQuestion.result).length;
-        if (state.currentInput.length >= targetLen) {
-            checkAnswer();
-        }
+        checkAnswer();
     }
 
-    // Tecla del teclado físico. Acumula dígitos y auto-comprueba cuando ya
-    // no pueden formar un número válido más largo (modo single con tope 10),
-    // o cuando se alcanza la longitud del resultado correcto (modo multi).
+    // Teclado físico, sólo en sumas (las multiplicaciones son selección de
+    // opciones en pantalla). Acumula dígitos hasta tener un número válido y
+    // comprueba; espera tras un "1" por si el usuario quiere escribir 10.
     function onPhysicalDigit(digit) {
-        if (state.finished || !state.game) return;
-        const game = state.game;
+        if (state.finished || !state.game || state.game.id !== 'sumas') return;
         const next = state.currentInput + String(digit);
         const value = parseInt(next, 10);
-
-        if (game.inputMode === 'single') {
-            const max = Math.max.apply(null, game.keypadValues);
-            if (next.length > 2 || value > max) return;
-            state.currentInput = next;
-            renderAnswer();
-            // Sólo "1" puede ser prefijo de "10"; el resto se comprueba ya.
-            if (value !== 1 || next.length === 2) checkAnswer();
-            return;
-        }
-
-        // multi
-        if (next.length > 3) return;
+        if (next.length > 2 || value > 10) return;
         state.currentInput = next;
         renderAnswer();
-        const targetLen = String(state.currentQuestion.result).length;
-        if (state.currentInput.length >= targetLen) checkAnswer();
+        if (value !== 1 || next.length === 2) checkAnswer();
     }
 
     function checkAnswer() {
@@ -354,7 +348,6 @@
         });
 
         $('btn-clear').addEventListener('click', clearInput);
-        $('btn-ok').addEventListener('click', submitAnswer);
 
         $('btn-retry').addEventListener('click', () => {
             if (state.game) startGame(state.game.id);
