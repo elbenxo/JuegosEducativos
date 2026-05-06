@@ -1,17 +1,68 @@
 (() => {
     'use strict';
 
+    // === Listas de palabras para el juego de Lengua ===
+    // Cada palabra se escribe en minúsculas; "upper" indica si la primera
+    // letra debería ir en mayúscula según las reglas del castellano.
+    // Reglas usadas:
+    //   - Nombres propios (personas, ciudades, países): mayúscula
+    //   - Sustantivos comunes: minúscula
+    //   - Días y meses: minúscula
+    //   - Idiomas y nacionalidades: minúscula
+    const LANG_WORDS = [
+        // Nombres propios de persona
+        { word: 'maría', upper: true }, { word: 'juan', upper: true },
+        { word: 'pedro', upper: true }, { word: 'ana', upper: true },
+        { word: 'carlos', upper: true }, { word: 'lucía', upper: true },
+        { word: 'sofía', upper: true }, { word: 'pablo', upper: true },
+        { word: 'laura', upper: true }, { word: 'marta', upper: true },
+        { word: 'diego', upper: true }, { word: 'elena', upper: true },
+        { word: 'andrés', upper: true }, { word: 'javier', upper: true },
+        // Nombres propios de lugar
+        { word: 'madrid', upper: true }, { word: 'barcelona', upper: true },
+        { word: 'sevilla', upper: true }, { word: 'valencia', upper: true },
+        { word: 'españa', upper: true }, { word: 'europa', upper: true },
+        { word: 'francia', upper: true }, { word: 'italia', upper: true },
+        { word: 'portugal', upper: true }, { word: 'londres', upper: true },
+        { word: 'parís', upper: true }, { word: 'roma', upper: true },
+        { word: 'méxico', upper: true }, { word: 'argentina', upper: true },
+        // Sustantivos comunes
+        { word: 'casa', upper: false }, { word: 'perro', upper: false },
+        { word: 'gato', upper: false }, { word: 'libro', upper: false },
+        { word: 'mesa', upper: false }, { word: 'silla', upper: false },
+        { word: 'agua', upper: false }, { word: 'pan', upper: false },
+        { word: 'pelota', upper: false }, { word: 'árbol', upper: false },
+        { word: 'flor', upper: false }, { word: 'pájaro', upper: false },
+        { word: 'coche', upper: false }, { word: 'manzana', upper: false },
+        { word: 'plátano', upper: false }, { word: 'colegio', upper: false },
+        { word: 'parque', upper: false }, { word: 'cuaderno', upper: false },
+        { word: 'mochila', upper: false }, { word: 'bicicleta', upper: false },
+        // Días de la semana
+        { word: 'lunes', upper: false }, { word: 'martes', upper: false },
+        { word: 'miércoles', upper: false }, { word: 'jueves', upper: false },
+        { word: 'viernes', upper: false }, { word: 'sábado', upper: false },
+        { word: 'domingo', upper: false },
+        // Meses
+        { word: 'enero', upper: false }, { word: 'febrero', upper: false },
+        { word: 'marzo', upper: false }, { word: 'abril', upper: false },
+        { word: 'mayo', upper: false }, { word: 'junio', upper: false },
+        { word: 'julio', upper: false }, { word: 'agosto', upper: false },
+        { word: 'septiembre', upper: false }, { word: 'octubre', upper: false },
+        { word: 'noviembre', upper: false }, { word: 'diciembre', upper: false },
+        // Idiomas y nacionalidades
+        { word: 'español', upper: false }, { word: 'inglés', upper: false },
+        { word: 'francés', upper: false }, { word: 'italiano', upper: false },
+        { word: 'alemán', upper: false }, { word: 'chino', upper: false },
+    ];
+
     // === Catálogo de juegos ===
-    // Cada juego define su generador, operador, total de retos, tiempo límite
-    // y los valores a mostrar en el teclado para cada pregunta.
     const GAMES = {
         sumas: {
             id: 'sumas',
             title: 'Sumas Rápidas',
-            operator: '+',
             total: 60,
             timeLimit: 120,
-            keypadClass: 'cols-4',          // teclado fijo 0..10
+            keypadClass: 'cols-4',
             generate(prev) {
                 let a, b, result;
                 do {
@@ -23,26 +74,46 @@
                 } while (prev && prev.a === a && prev.b === b);
                 return { a, b, result };
             },
+            renderQuestion(q, container) {
+                container.innerHTML =
+                    `<div class="math-row">` +
+                    `<span class="num">${q.a}</span>` +
+                    `<span class="op">+</span>` +
+                    `<span class="num">${q.b}</span>` +
+                    `<span class="op">=</span>` +
+                    `<span class="num answer-slot">?</span>` +
+                    `</div>`;
+            },
             getKeypadValues() { return range(0, 10); },
+            formatAnswer(q) { return String(q.result); },
         },
+
         multi: {
             id: 'multi',
             title: 'Multiplicaciones Rápidas',
-            operator: '×',
             total: 40,
             timeLimit: 120,
-            keypadClass: 'options',         // 4 opciones por pregunta
+            keypadClass: 'options',
             generate(prev) {
                 let a, b, result;
                 do {
-                    a = 1 + Math.floor(Math.random() * 9);   // 1..9
-                    b = 1 + Math.floor(Math.random() * 9);   // 1..9
+                    a = 1 + Math.floor(Math.random() * 9);
+                    b = 1 + Math.floor(Math.random() * 9);
                     result = a * b;
                 } while (prev && prev.a === a && prev.b === b);
                 return { a, b, result };
             },
-            // 4 opciones: la correcta + 3 distractores cercanos plausibles
-            // (productos de pares de factores próximos), barajadas.
+            renderQuestion(q, container) {
+                container.innerHTML =
+                    `<div class="math-row">` +
+                    `<span class="num">${q.a}</span>` +
+                    `<span class="op">×</span>` +
+                    `<span class="num">${q.b}</span>` +
+                    `<span class="op">=</span>` +
+                    `<span class="num answer-slot">?</span>` +
+                    `</div>`;
+            },
+            // 4 opciones: la correcta + 3 distractores plausibles.
             getKeypadValues(q) {
                 const correct = q.result;
                 const candidates = new Set();
@@ -58,6 +129,48 @@
                 }
                 const distractors = shuffle(Array.from(candidates)).slice(0, 3);
                 return shuffle([correct, ...distractors]);
+            },
+            formatAnswer(q) { return String(q.result); },
+        },
+
+        lengua: {
+            id: 'lengua',
+            title: '¿Mayúscula o minúscula?',
+            total: 30,
+            timeLimit: 120,
+            keypadClass: 'binary',
+            generate(prev) {
+                let pick;
+                do {
+                    pick = LANG_WORDS[Math.floor(Math.random() * LANG_WORDS.length)];
+                } while (prev && prev.word === pick.word);
+                const first = pick.word.charAt(0);
+                const rest = pick.word.slice(1);
+                return {
+                    word: pick.word,
+                    first,
+                    rest,
+                    result: pick.upper ? 'upper' : 'lower',
+                };
+            },
+            renderQuestion(q, container) {
+                container.innerHTML =
+                    `<div class="word-question">` +
+                    `  <span class="word-blank">?</span>` +
+                    `  <span class="word-rest">${escapeHtml(q.rest)}</span>` +
+                    `</div>` +
+                    `<div class="word-prompt">¿Cómo empieza?</div>`;
+            },
+            getKeypadValues(q) {
+                return [
+                    { label: q.first.toUpperCase(), sub: 'MAYÚSCULA', value: 'upper' },
+                    { label: q.first, sub: 'minúscula', value: 'lower' },
+                ];
+            },
+            formatAnswer(q) {
+                const letter = q.result === 'upper' ? q.first.toUpperCase() : q.first;
+                const label = q.result === 'upper' ? 'mayúscula' : 'minúscula';
+                return `${letter}${q.rest} (${label})`;
             },
         },
     };
@@ -76,18 +189,23 @@
         return arr;
     }
 
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
     // === Estado ===
     const state = {
         playerName: '',
         game: null,
         currentIndex: 0,
         correct: 0,
-        attempts: 0,
         timeLeft: 0,
         timerId: null,
         currentQuestion: null,
-        currentInput: '',
         finished: false,
+        locked: false, // bloquea entrada mientras se muestra feedback
     };
 
     const $ = (id) => document.getElementById(id);
@@ -103,18 +221,24 @@
     }
 
     // === Construcción del teclado según el juego y la pregunta ===
-    // Cada botón es una respuesta completa: al pulsarlo se comprueba.
     function buildKeypad(game, question) {
         const keypad = $('keypad');
         keypad.innerHTML = '';
         keypad.className = 'keypad ' + (game.keypadClass || '');
         const values = game.getKeypadValues(question);
-        values.forEach((n) => {
+        values.forEach((v) => {
             const btn = document.createElement('button');
             btn.className = 'key';
             btn.type = 'button';
-            btn.textContent = n;
-            btn.addEventListener('click', () => onKeyPress(n));
+            if (typeof v === 'object') {
+                btn.innerHTML =
+                    `<span class="key-label">${escapeHtml(v.label)}</span>` +
+                    (v.sub ? `<span class="key-sub">${escapeHtml(v.sub)}</span>` : '');
+                btn.addEventListener('click', () => onAnswer(v.value));
+            } else {
+                btn.textContent = v;
+                btn.addEventListener('click', () => onAnswer(v));
+            }
             keypad.appendChild(btn);
         });
     }
@@ -132,14 +256,12 @@
         state.game = GAMES[gameId];
         state.currentIndex = 0;
         state.correct = 0;
-        state.attempts = 0;
         state.timeLeft = state.game.timeLimit;
         state.finished = false;
-        state.currentInput = '';
+        state.locked = false;
         state.currentQuestion = null;
 
         $('hud-name').textContent = state.playerName;
-        $('op').textContent = state.game.operator;
         updateHUD();
         nextQuestion();
         startTimer();
@@ -171,80 +293,39 @@
             return;
         }
         state.currentQuestion = state.game.generate(state.currentQuestion);
-        state.currentInput = '';
-        $('num-a').textContent = state.currentQuestion.a;
-        $('num-b').textContent = state.currentQuestion.b;
+        state.game.renderQuestion(state.currentQuestion, $('question'));
         buildKeypad(state.game, state.currentQuestion);
-        renderAnswer();
+        state.locked = false;
     }
 
-    function renderAnswer() {
-        const slot = $('answer-display');
-        if (state.currentInput === '') {
-            slot.textContent = '?';
-            slot.classList.remove('filled');
-        } else {
-            slot.textContent = state.currentInput;
-            slot.classList.add('filled');
-        }
-    }
-
-    // Cada pulsación de tecla es una respuesta completa.
-    function onKeyPress(value) {
-        if (state.finished) return;
-        state.currentInput = String(value);
-        renderAnswer();
-        checkAnswer();
-    }
-
-    // Teclado físico, sólo en sumas (las multiplicaciones son selección de
-    // opciones en pantalla). Acumula dígitos hasta tener un número válido y
-    // comprueba; espera tras un "1" por si el usuario quiere escribir 10.
-    function onPhysicalDigit(digit) {
-        if (state.finished || !state.game || state.game.id !== 'sumas') return;
-        const next = state.currentInput + String(digit);
-        const value = parseInt(next, 10);
-        if (next.length > 2 || value > 10) return;
-        state.currentInput = next;
-        renderAnswer();
-        if (value !== 1 || next.length === 2) checkAnswer();
-    }
-
-    function checkAnswer() {
-        const guess = parseInt(state.currentInput, 10);
-        if (isNaN(guess)) return;
-        state.attempts++;
+    // Una respuesta cualquiera. Si acierta, suma punto y avanza pronto.
+    // Si falla, NO permite reintentar la misma operación: muestra brevemente
+    // la respuesta correcta y pasa a la siguiente pregunta.
+    function onAnswer(value) {
+        if (state.finished || state.locked || !state.currentQuestion) return;
+        state.locked = true;
+        const correct = value === state.currentQuestion.result
+            || String(value) === String(state.currentQuestion.result);
         const fb = $('feedback');
-        if (guess === state.currentQuestion.result) {
+        if (correct) {
             state.correct++;
-            state.currentIndex++;
             fb.textContent = '¡Correcto! ✅';
             fb.className = 'feedback show correct';
             updateHUD();
             setTimeout(() => {
                 fb.className = 'feedback';
+                state.currentIndex++;
                 nextQuestion();
-            }, 350);
+            }, 400);
         } else {
-            fb.textContent = '¡Inténtalo otra vez! ❌';
+            fb.textContent = `❌ Era ${state.game.formatAnswer(state.currentQuestion)}`;
             fb.className = 'feedback show wrong';
-            state.currentInput = '';
             setTimeout(() => {
                 fb.className = 'feedback';
-                renderAnswer();
-            }, 700);
+                state.currentIndex++;
+                nextQuestion();
+            }, 1100);
         }
-    }
-
-    function clearInput() {
-        if (state.finished) return;
-        state.currentInput = '';
-        renderAnswer();
-    }
-
-    function submitAnswer() {
-        if (state.finished) return;
-        if (state.currentInput !== '') checkAnswer();
     }
 
     function updateHUD() {
@@ -257,41 +338,36 @@
         state.finished = true;
         clearInterval(state.timerId);
         const elapsed = state.game.timeLimit - state.timeLeft;
-        const accuracy = state.attempts > 0
-            ? Math.round((state.correct / state.attempts) * 100)
+        const accuracy = state.currentIndex > 0
+            ? Math.round((state.correct / state.currentIndex) * 100)
             : 0;
 
         $('stat-correct').textContent = `${state.correct} / ${state.game.total}`;
         $('stat-time').textContent = `${elapsed}s`;
         $('stat-accuracy').textContent = `${accuracy}%`;
 
-        const success = completed && state.correct === state.game.total;
+        const allCorrect = completed && state.correct === state.game.total;
         const safeName = escapeHtml(state.playerName);
 
-        if (success) {
+        if (allCorrect) {
             $('result-title').textContent = '🎉 ¡Felicidades!';
             $('result-message').innerHTML =
                 `¡Lo lograste, <strong>${safeName}</strong>! ` +
-                `Resolviste las ${state.game.total} ${state.game.title.toLowerCase()} en ` +
-                `<strong>${elapsed} segundos</strong>. ` +
-                `¡Eres una estrella de las matemáticas! ⭐`;
+                `Acertaste las ${state.game.total} en <strong>${elapsed} segundos</strong>. ` +
+                `¡Eres una estrella! ⭐`;
             launchConfetti();
         } else {
-            $('result-title').textContent = '💪 ¡Casi lo tienes!';
-            const reason = state.timeLeft <= 0 ? 'Se acabó el tiempo' : 'Aún te quedaban retos';
+            $('result-title').textContent = '💪 ¡Buen intento!';
+            const reason = state.timeLeft <= 0
+                ? 'Se acabó el tiempo'
+                : 'Has terminado';
             $('result-message').innerHTML =
                 `${reason}, <strong>${safeName}</strong>. ` +
                 `Conseguiste <strong>${state.correct}</strong> aciertos. ` +
-                `¡Inténtalo otra vez, seguro que lo consigues! 🚀`;
+                `¡Inténtalo otra vez, seguro que mejoras! 🚀`;
         }
 
         showScreen('result');
-    }
-
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
     }
 
     // === Confeti ===
@@ -335,7 +411,6 @@
 
     // === Eventos ===
     function bindEvents() {
-        // Tarjetas de juego en la pantalla de bienvenida
         document.querySelectorAll('.game-card').forEach((card) => {
             card.addEventListener('click', () => startGame(card.dataset.game));
         });
@@ -346,8 +421,6 @@
                 document.querySelector('.game-card').focus();
             }
         });
-
-        $('btn-clear').addEventListener('click', clearInput);
 
         $('btn-retry').addEventListener('click', () => {
             if (state.game) startGame(state.game.id);
@@ -364,17 +437,6 @@
             $('player-name').value = '';
             showScreen('welcome');
             $('player-name').focus();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (!screens.game.classList.contains('active') || state.finished) return;
-            if (/^[0-9]$/.test(e.key)) {
-                onPhysicalDigit(e.key);
-            } else if (e.key === 'Backspace') {
-                clearInput();
-            } else if (e.key === 'Enter') {
-                submitAnswer();
-            }
         });
     }
 
