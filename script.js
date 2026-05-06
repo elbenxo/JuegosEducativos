@@ -144,33 +144,27 @@
                 do {
                     pick = LANG_WORDS[Math.floor(Math.random() * LANG_WORDS.length)];
                 } while (prev && prev.word === pick.word);
-                const first = pick.word.charAt(0);
-                const rest = pick.word.slice(1);
+                const lower = pick.word;
+                const upper = lower.charAt(0).toUpperCase() + lower.slice(1);
                 return {
-                    word: pick.word,
-                    first,
-                    rest,
+                    word: lower,
+                    upper,
+                    lower,
                     result: pick.upper ? 'upper' : 'lower',
                 };
             },
             renderQuestion(q, container) {
-                container.innerHTML =
-                    `<div class="word-question">` +
-                    `  <span class="word-blank">?</span>` +
-                    `  <span class="word-rest">${escapeHtml(q.rest)}</span>` +
-                    `</div>` +
-                    `<div class="word-prompt">¿Cómo empieza?</div>`;
+                container.innerHTML = `<div class="word-prompt">¿Cuál está bien escrita?</div>`;
             },
+            // Mostramos ambas variantes (con y sin mayúscula inicial), barajadas.
             getKeypadValues(q) {
-                return [
-                    { label: q.first.toUpperCase(), sub: 'MAYÚSCULA', value: 'upper' },
-                    { label: q.first, sub: 'minúscula', value: 'lower' },
-                ];
+                return shuffle([
+                    { label: q.upper, value: 'upper' },
+                    { label: q.lower, value: 'lower' },
+                ]);
             },
             formatAnswer(q) {
-                const letter = q.result === 'upper' ? q.first.toUpperCase() : q.first;
-                const label = q.result === 'upper' ? 'mayúscula' : 'minúscula';
-                return `${letter}${q.rest} (${label})`;
+                return q.result === 'upper' ? q.upper : q.lower;
             },
         },
     };

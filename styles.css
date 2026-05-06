@@ -335,32 +335,27 @@ html, body {
 /* Variante del teclado: dos opciones (juego de mayúsculas/minúsculas) */
 .keypad.binary {
     grid-template-columns: repeat(2, 1fr);
-    max-width: 420px;
+    max-width: 520px;
     gap: 16px;
 }
 .keypad.binary .key {
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 22px 0;
+    padding: 26px 12px;
     background: linear-gradient(135deg, #d4f4dd 0%, #80d49e 100%);
     color: var(--text);
     box-shadow: 0 5px 0 #3a8c54;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.1;
 }
 .keypad.binary .key:hover {
     background: linear-gradient(135deg, #c2eecb 0%, #6cc78b 100%);
 }
 .keypad.binary .key-label {
-    font-size: 2.6rem;
+    font-size: clamp(1.4rem, 4.5vw, 2rem);
     font-weight: bold;
-    line-height: 1;
-}
-.keypad.binary .key-sub {
-    font-size: 0.95rem;
-    color: #2f5d3f;
-    text-transform: lowercase;
 }
 
 /* === Pregunta de palabra === */
