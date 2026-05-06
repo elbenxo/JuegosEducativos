@@ -9,8 +9,9 @@
     //   - Sustantivos comunes: minúscula
     //   - Días y meses: minúscula
     //   - Idiomas y nacionalidades: minúscula
+    //   - Colores y números: minúscula
     const LANG_WORDS = [
-        // Nombres propios de persona
+        // --- Nombres propios de persona (MAYÚSCULA) ---
         { word: 'maría', upper: true }, { word: 'juan', upper: true },
         { word: 'pedro', upper: true }, { word: 'ana', upper: true },
         { word: 'carlos', upper: true }, { word: 'lucía', upper: true },
@@ -18,7 +19,26 @@
         { word: 'laura', upper: true }, { word: 'marta', upper: true },
         { word: 'diego', upper: true }, { word: 'elena', upper: true },
         { word: 'andrés', upper: true }, { word: 'javier', upper: true },
-        // Nombres propios de lugar
+        { word: 'alberto', upper: true }, { word: 'beatriz', upper: true },
+        { word: 'cristina', upper: true }, { word: 'daniel', upper: true },
+        { word: 'eduardo', upper: true }, { word: 'fátima', upper: true },
+        { word: 'gabriel', upper: true }, { word: 'hugo', upper: true },
+        { word: 'irene', upper: true }, { word: 'jorge', upper: true },
+        { word: 'leticia', upper: true }, { word: 'manuel', upper: true },
+        { word: 'natalia', upper: true }, { word: 'óscar', upper: true },
+        { word: 'patricia', upper: true }, { word: 'raquel', upper: true },
+        { word: 'sergio', upper: true }, { word: 'teresa', upper: true },
+        { word: 'víctor', upper: true }, { word: 'alicia', upper: true },
+        { word: 'bruno', upper: true }, { word: 'carmen', upper: true },
+        { word: 'david', upper: true }, { word: 'eva', upper: true },
+        { word: 'fernando', upper: true }, { word: 'héctor', upper: true },
+        { word: 'isabel', upper: true }, { word: 'mario', upper: true },
+        { word: 'noelia', upper: true }, { word: 'paula', upper: true },
+        { word: 'raúl', upper: true }, { word: 'silvia', upper: true },
+        { word: 'tomás', upper: true }, { word: 'miguel', upper: true },
+        { word: 'nuria', upper: true }, { word: 'ramón', upper: true },
+
+        // --- Nombres propios de lugar (MAYÚSCULA) ---
         { word: 'madrid', upper: true }, { word: 'barcelona', upper: true },
         { word: 'sevilla', upper: true }, { word: 'valencia', upper: true },
         { word: 'españa', upper: true }, { word: 'europa', upper: true },
@@ -26,33 +46,134 @@
         { word: 'portugal', upper: true }, { word: 'londres', upper: true },
         { word: 'parís', upper: true }, { word: 'roma', upper: true },
         { word: 'méxico', upper: true }, { word: 'argentina', upper: true },
-        // Sustantivos comunes
-        { word: 'casa', upper: false }, { word: 'perro', upper: false },
-        { word: 'gato', upper: false }, { word: 'libro', upper: false },
-        { word: 'mesa', upper: false }, { word: 'silla', upper: false },
-        { word: 'agua', upper: false }, { word: 'pan', upper: false },
-        { word: 'pelota', upper: false }, { word: 'árbol', upper: false },
-        { word: 'flor', upper: false }, { word: 'pájaro', upper: false },
-        { word: 'coche', upper: false }, { word: 'manzana', upper: false },
-        { word: 'plátano', upper: false }, { word: 'colegio', upper: false },
-        { word: 'parque', upper: false }, { word: 'cuaderno', upper: false },
-        { word: 'mochila', upper: false }, { word: 'bicicleta', upper: false },
-        // Días de la semana
+        { word: 'bilbao', upper: true }, { word: 'zaragoza', upper: true },
+        { word: 'málaga', upper: true }, { word: 'granada', upper: true },
+        { word: 'toledo', upper: true }, { word: 'salamanca', upper: true },
+        { word: 'oviedo', upper: true }, { word: 'santander', upper: true },
+        { word: 'alemania', upper: true }, { word: 'japón', upper: true },
+        { word: 'china', upper: true }, { word: 'brasil', upper: true },
+        { word: 'perú', upper: true }, { word: 'chile', upper: true },
+        { word: 'colombia', upper: true }, { word: 'cuba', upper: true },
+        { word: 'ecuador', upper: true }, { word: 'uruguay', upper: true },
+        { word: 'asia', upper: true }, { word: 'áfrica', upper: true },
+        { word: 'berlín', upper: true }, { word: 'lisboa', upper: true },
+        { word: 'dublín', upper: true }, { word: 'andalucía', upper: true },
+        { word: 'galicia', upper: true }, { word: 'cataluña', upper: true },
+        { word: 'ebro', upper: true }, { word: 'duero', upper: true },
+        { word: 'tajo', upper: true }, { word: 'pirineos', upper: true },
+
+        // --- Sustantivos comunes (minúscula) ---
+        // animales
+        { word: 'perro', upper: false }, { word: 'gato', upper: false },
+        { word: 'caballo', upper: false }, { word: 'vaca', upper: false },
+        { word: 'cerdo', upper: false }, { word: 'oveja', upper: false },
+        { word: 'cabra', upper: false }, { word: 'gallina', upper: false },
+        { word: 'conejo', upper: false }, { word: 'ratón', upper: false },
+        { word: 'elefante', upper: false }, { word: 'jirafa', upper: false },
+        { word: 'león', upper: false }, { word: 'tigre', upper: false },
+        { word: 'oso', upper: false }, { word: 'lobo', upper: false },
+        { word: 'zorro', upper: false }, { word: 'ardilla', upper: false },
+        { word: 'búho', upper: false }, { word: 'águila', upper: false },
+        { word: 'pájaro', upper: false }, { word: 'mariposa', upper: false },
+        { word: 'abeja', upper: false }, { word: 'hormiga', upper: false },
+        { word: 'pez', upper: false }, { word: 'ballena', upper: false },
+        { word: 'delfín', upper: false }, { word: 'tortuga', upper: false },
+        { word: 'rana', upper: false }, { word: 'serpiente', upper: false },
+        // comida
+        { word: 'pan', upper: false }, { word: 'leche', upper: false },
+        { word: 'queso', upper: false }, { word: 'huevo', upper: false },
+        { word: 'jamón', upper: false }, { word: 'pollo', upper: false },
+        { word: 'carne', upper: false }, { word: 'pescado', upper: false },
+        { word: 'arroz', upper: false }, { word: 'sopa', upper: false },
+        { word: 'tomate', upper: false }, { word: 'manzana', upper: false },
+        { word: 'naranja', upper: false }, { word: 'pera', upper: false },
+        { word: 'fresa', upper: false }, { word: 'uva', upper: false },
+        { word: 'sandía', upper: false }, { word: 'melón', upper: false },
+        { word: 'limón', upper: false }, { word: 'plátano', upper: false },
+        { word: 'patata', upper: false }, { word: 'lechuga', upper: false },
+        { word: 'chocolate', upper: false }, { word: 'galleta', upper: false },
+        { word: 'helado', upper: false }, { word: 'pastel', upper: false },
+        { word: 'miel', upper: false }, { word: 'agua', upper: false },
+        // objetos / casa / ciudad
+        { word: 'casa', upper: false }, { word: 'puerta', upper: false },
+        { word: 'ventana', upper: false }, { word: 'mesa', upper: false },
+        { word: 'silla', upper: false }, { word: 'cama', upper: false },
+        { word: 'lámpara', upper: false }, { word: 'cocina', upper: false },
+        { word: 'baño', upper: false }, { word: 'jardín', upper: false },
+        { word: 'libro', upper: false }, { word: 'cuaderno', upper: false },
+        { word: 'mochila', upper: false }, { word: 'lápiz', upper: false },
+        { word: 'goma', upper: false }, { word: 'regla', upper: false },
+        { word: 'pizarra', upper: false }, { word: 'tijeras', upper: false },
+        { word: 'pelota', upper: false }, { word: 'bicicleta', upper: false },
+        { word: 'coche', upper: false }, { word: 'autobús', upper: false },
+        { word: 'tren', upper: false }, { word: 'avión', upper: false },
+        { word: 'barco', upper: false }, { word: 'colegio', upper: false },
+        { word: 'parque', upper: false }, { word: 'plaza', upper: false },
+        { word: 'tienda', upper: false }, { word: 'hospital', upper: false },
+        { word: 'museo', upper: false }, { word: 'estación', upper: false },
+        { word: 'calle', upper: false },
+        // naturaleza
+        { word: 'árbol', upper: false }, { word: 'flor', upper: false },
+        { word: 'hoja', upper: false }, { word: 'río', upper: false },
+        { word: 'mar', upper: false }, { word: 'montaña', upper: false },
+        { word: 'playa', upper: false }, { word: 'bosque', upper: false },
+        { word: 'lluvia', upper: false }, { word: 'nieve', upper: false },
+        { word: 'viento', upper: false }, { word: 'nube', upper: false },
+        { word: 'estrella', upper: false }, { word: 'cielo', upper: false },
+        { word: 'tierra', upper: false }, { word: 'fuego', upper: false },
+        { word: 'arena', upper: false },
+        // cuerpo
+        { word: 'mano', upper: false }, { word: 'pie', upper: false },
+        { word: 'ojo', upper: false }, { word: 'nariz', upper: false },
+        { word: 'boca', upper: false }, { word: 'oreja', upper: false },
+        { word: 'brazo', upper: false }, { word: 'pierna', upper: false },
+        { word: 'cabeza', upper: false }, { word: 'dedo', upper: false },
+        { word: 'diente', upper: false },
+        // familia
+        { word: 'madre', upper: false }, { word: 'padre', upper: false },
+        { word: 'hermano', upper: false }, { word: 'hermana', upper: false },
+        { word: 'abuelo', upper: false }, { word: 'abuela', upper: false },
+        { word: 'tío', upper: false }, { word: 'tía', upper: false },
+        { word: 'primo', upper: false }, { word: 'prima', upper: false },
+        { word: 'hijo', upper: false }, { word: 'hija', upper: false },
+
+        // --- Días de la semana (minúscula) ---
         { word: 'lunes', upper: false }, { word: 'martes', upper: false },
         { word: 'miércoles', upper: false }, { word: 'jueves', upper: false },
         { word: 'viernes', upper: false }, { word: 'sábado', upper: false },
         { word: 'domingo', upper: false },
-        // Meses
+
+        // --- Meses (minúscula) ---
         { word: 'enero', upper: false }, { word: 'febrero', upper: false },
         { word: 'marzo', upper: false }, { word: 'abril', upper: false },
         { word: 'mayo', upper: false }, { word: 'junio', upper: false },
         { word: 'julio', upper: false }, { word: 'agosto', upper: false },
         { word: 'septiembre', upper: false }, { word: 'octubre', upper: false },
         { word: 'noviembre', upper: false }, { word: 'diciembre', upper: false },
-        // Idiomas y nacionalidades
+
+        // --- Idiomas y nacionalidades (minúscula) ---
         { word: 'español', upper: false }, { word: 'inglés', upper: false },
         { word: 'francés', upper: false }, { word: 'italiano', upper: false },
         { word: 'alemán', upper: false }, { word: 'chino', upper: false },
+        { word: 'japonés', upper: false }, { word: 'ruso', upper: false },
+        { word: 'portugués', upper: false }, { word: 'árabe', upper: false },
+        { word: 'mexicano', upper: false }, { word: 'argentino', upper: false },
+        { word: 'colombiano', upper: false }, { word: 'peruano', upper: false },
+        { word: 'chileno', upper: false },
+
+        // --- Colores (minúscula) ---
+        { word: 'rojo', upper: false }, { word: 'azul', upper: false },
+        { word: 'verde', upper: false }, { word: 'amarillo', upper: false },
+        { word: 'blanco', upper: false }, { word: 'negro', upper: false },
+        { word: 'marrón', upper: false }, { word: 'gris', upper: false },
+        { word: 'morado', upper: false },
+
+        // --- Números (minúscula) ---
+        { word: 'uno', upper: false }, { word: 'dos', upper: false },
+        { word: 'tres', upper: false }, { word: 'cuatro', upper: false },
+        { word: 'cinco', upper: false }, { word: 'seis', upper: false },
+        { word: 'siete', upper: false }, { word: 'ocho', upper: false },
+        { word: 'nueve', upper: false }, { word: 'diez', upper: false },
     ];
 
     // === Catálogo de juegos ===
