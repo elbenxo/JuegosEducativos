@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juegos Educativos - Sumas Rápidas</title>
+    <title>Juegos Educativos</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,14 +12,8 @@
         <!-- PANTALLA 1: BIENVENIDA -->
         <section id="screen-welcome" class="screen active">
             <div class="card">
-                <h1 class="title">🎯 Sumas Rápidas</h1>
-                <p class="subtitle">¡Resuelve 60 sumas en menos de 2 minutos!</p>
-
-                <div class="rules">
-                    <div class="rule">⏱️ Tiempo: <strong>2 minutos</strong></div>
-                    <div class="rule">➕ Sumas: <strong>60 retos</strong></div>
-                    <div class="rule">🔢 Resultados hasta <strong>10</strong></div>
-                </div>
+                <h1 class="title">🎯 Juegos Educativos</h1>
+                <p class="subtitle">¡Practica matemáticas y bate tu récord!</p>
 
                 <label for="player-name" class="label">¿Cómo te llamas?</label>
                 <input
@@ -31,9 +25,21 @@
                     autocomplete="off"
                 />
 
-                <button id="btn-start" class="btn btn-primary">
-                    ¡Empezar! 🚀
-                </button>
+                <h2 class="section-heading">Elige tu juego</h2>
+
+                <div class="game-cards">
+                    <button class="game-card" data-game="sumas" type="button">
+                        <span class="game-emoji">➕</span>
+                        <span class="game-name">Sumas Rápidas</span>
+                        <span class="game-desc">60 sumas en 2 minutos<br>Resultados hasta 10</span>
+                    </button>
+
+                    <button class="game-card" data-game="multi" type="button">
+                        <span class="game-emoji">✖️</span>
+                        <span class="game-name">Multiplicaciones Rápidas</span>
+                        <span class="game-desc">40 multiplicaciones en 2 minutos<br>Tablas del 1 al 9</span>
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -47,7 +53,7 @@
                     </div>
                     <div class="hud-item">
                         <span class="hud-label">Acertadas</span>
-                        <span id="hud-score" class="hud-value">0 / 60</span>
+                        <span id="hud-score" class="hud-value">0 / 0</span>
                     </div>
                     <div class="hud-item">
                         <span class="hud-label">Tiempo</span>
@@ -63,17 +69,20 @@
                 <div id="feedback" class="feedback"></div>
                 <div class="question" aria-live="polite">
                     <span id="num-a" class="num">0</span>
-                    <span class="op">+</span>
+                    <span id="op" class="op">+</span>
                     <span id="num-b" class="num">0</span>
                     <span class="op">=</span>
                     <span id="answer-display" class="num answer-slot">?</span>
                 </div>
 
                 <div class="keypad" id="keypad">
-                    <!-- generado por JS -->
+                    <!-- generado por JS según el juego -->
                 </div>
 
-                <button id="btn-clear" class="btn btn-secondary btn-clear">Borrar ⌫</button>
+                <div class="keypad-actions">
+                    <button id="btn-clear" class="btn btn-secondary btn-action">Borrar ⌫</button>
+                    <button id="btn-ok" class="btn btn-primary btn-action" hidden>Listo ✓</button>
+                </div>
             </main>
         </section>
 
@@ -99,7 +108,8 @@
                 </div>
 
                 <div class="button-row">
-                    <button id="btn-retry" class="btn btn-primary">Intentar otra vez 🔁</button>
+                    <button id="btn-retry" class="btn btn-primary">Otra vez 🔁</button>
+                    <button id="btn-menu" class="btn btn-secondary">Otro juego 🎮</button>
                     <button id="btn-home" class="btn btn-secondary">Cambiar jugador 👤</button>
                 </div>
             </div>

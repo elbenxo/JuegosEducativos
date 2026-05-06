@@ -1,26 +1,70 @@
 (() => {
     'use strict';
 
-    // === Configuración del juego ===
-    const TOTAL_QUESTIONS = 60;
-    const TIME_LIMIT_SECONDS = 120;
-    const MAX_RESULT = 10;
+    // === Catálogo de juegos ===
+    // Cada juego define su generador, operador, total de retos, tiempo límite
+    // y cómo se introduce la respuesta (single = un toque; multi = teclear).
+    const GAMES = {
+        sumas: {
+            id: 'sumas',
+            title: 'Sumas Rápidas',
+            operator: '+',
+            total: 60,
+            timeLimit: 120,
+            inputMode: 'single',          // teclas 0..10, cada tecla = respuesta
+            keypadValues: range(0, 10),
+            generate(prev) {
+                let a, b, result;
+                do {
+                    result = 1 + Math.floor(Math.random() * 10);
+                    const aMin = Math.max(0, result - 9);
+                    const aMax = Math.min(9, result);
+                    a = aMin + Math.floor(Math.random() * (aMax - aMin + 1));
+                    b = result - a;
+                } while (prev && prev.a === a && prev.b === b);
+                return { a, b, result };
+            },
+        },
+        multi: {
+            id: 'multi',
+            title: 'Multiplicaciones Rápidas',
+            operator: '×',
+            total: 40,
+            timeLimit: 120,
+            inputMode: 'multi',           // teclado 0..9, se teclea la respuesta
+            keypadValues: range(1, 9).concat(0),
+            generate(prev) {
+                let a, b, result;
+                do {
+                    a = 1 + Math.floor(Math.random() * 9);   // 1..9
+                    b = 1 + Math.floor(Math.random() * 9);   // 1..9
+                    result = a * b;
+                } while (prev && prev.a === a && prev.b === b);
+                return { a, b, result };
+            },
+        },
+    };
+
+    function range(from, to) {
+        const out = [];
+        for (let i = from; i <= to; i++) out.push(i);
+        return out;
+    }
 
     // === Estado ===
     const state = {
         playerName: '',
+        game: null,
         currentIndex: 0,
         correct: 0,
         attempts: 0,
-        timeLeft: TIME_LIMIT_SECONDS,
-        startTime: 0,
+        timeLeft: 0,
         timerId: null,
         currentQuestion: null,
         currentInput: '',
         finished: false,
     };
 
-    // === Referencias DOM ===
     const $ = (id) => document.getElementById(id);
     const screens = {
         welcome: $('screen-welcome'),
@@ -28,42 +72,32 @@
         result: $('screen-result'),
     };
 
-    // === Generador de sumas ===
-    // Suma de dos sumandos (1-9) cuyo resultado es <= 10.
-    function generateQuestion(prev) {
-        let a, b;
-        do {
-            a = 1 + Math.floor(Math.random() * 9);          // 1..9
-            const maxB = Math.min(9, MAX_RESULT - a);
-            b = 1 + Math.floor(Math.random() * maxB);       // 1..maxB
-        } while (prev && prev.a === a && prev.b === b);
-        return { a, b, result: a + b };
-    }
-
-    // === Cambio de pantalla ===
     function showScreen(name) {
         Object.values(screens).forEach((s) => s.classList.remove('active'));
         screens[name].classList.add('active');
     }
 
-    // === Construcción del teclado numérico (0-10) ===
-    // Cada botón representa una respuesta completa: al pulsarlo se comprueba.
-    function buildKeypad() {
+    // === Construcción del teclado según el juego ===
+    function buildKeypad(game) {
         const keypad = $('keypad');
         keypad.innerHTML = '';
-        for (let n = 0; n <= 10; n++) {
+        keypad.classList.toggle('digits', game.inputMode === 'multi');
+
+        game.keypadValues.forEach((n) => {
             const btn = document.createElement('button');
             btn.className = 'key';
             btn.type = 'button';
             btn.textContent = n;
-            btn.dataset.value = n;
-            btn.addEventListener('click', () => onKeypadAnswer(n));
+            btn.addEventListener('click', () => onKeyPress(n));
             keypad.appendChild(btn);
-        }
+        });
+
+        // El botón "Listo ✓" sólo aparece en modo multi-dígito
+        $('btn-ok').hidden = game.inputMode !== 'multi';
     }
 
-    // === Lógica del juego ===
-    function startGame() {
+    // === Inicio del juego ===
+    function startGame(gameId) {
         const name = $('player-name').value.trim();
         if (!name) {
             $('player-name').focus();
@@ -72,15 +106,18 @@
             return;
         }
         state.playerName = name;
+        state.game = GAMES[gameId];
         state.currentIndex = 0;
         state.correct = 0;
         state.attempts = 0;
-        state.timeLeft = TIME_LIMIT_SECONDS;
-        state.startTime = Date.now();
+        state.timeLeft = state.game.timeLimit;
         state.finished = false;
         state.currentInput = '';
+        state.currentQuestion = null;
 
         $('hud-name').textContent = state.playerName;
+        $('op').textContent = state.game.operator;
+        buildKeypad(state.game);
         updateHUD();
         nextQuestion();
         startTimer();
@@ -93,9 +130,7 @@
         state.timerId = setInterval(() => {
             state.timeLeft--;
             renderTimer();
-            if (state.timeLeft <= 0) {
-                endGame(false);
-            }
+            if (state.timeLeft <= 0) endGame(false);
         }, 1000);
     }
 
@@ -109,11 +144,11 @@
     }
 
     function nextQuestion() {
-        if (state.currentIndex >= TOTAL_QUESTIONS) {
+        if (state.currentIndex >= state.game.total) {
             endGame(true);
             return;
         }
-        state.currentQuestion = generateQuestion(state.currentQuestion);
+        state.currentQuestion = state.game.generate(state.currentQuestion);
         state.currentInput = '';
         $('num-a').textContent = state.currentQuestion.a;
         $('num-b').textContent = state.currentQuestion.b;
@@ -131,30 +166,59 @@
         }
     }
 
-    // Pulsación en el teclado de pantalla: la respuesta es directa.
-    function onKeypadAnswer(num) {
+    // Una pulsación: en modo single equivale a una respuesta completa,
+    // en modo multi se acumulan dígitos y se auto-comprueba al alcanzar la
+    // longitud del resultado correcto.
+    function onKeyPress(value) {
         if (state.finished) return;
-        state.currentInput = String(num);
-        renderAnswer();
-        checkAnswer();
-    }
-
-    // Tecla del teclado físico: acumulamos hasta tener un número válido (0-10).
-    // Para "1" esperamos por si el usuario quiere escribir 10 (Enter confirma 1).
-    function onPhysicalDigit(digit) {
-        if (state.finished) return;
-        const next = state.currentInput + digit;
-        const value = parseInt(next, 10);
-        if (next.length > 2 || value > 10) return;
+        const game = state.game;
+        if (game.inputMode === 'single') {
+            state.currentInput = String(value);
+            renderAnswer();
+            checkAnswer();
+            return;
+        }
+        // multi
+        const next = state.currentInput + String(value);
+        if (next.length > 3) return;                 // los resultados llegan a 81
         state.currentInput = next;
         renderAnswer();
-        if (value === 0 || (value >= 2 && value <= 10)) {
+        const targetLen = String(state.currentQuestion.result).length;
+        if (state.currentInput.length >= targetLen) {
             checkAnswer();
         }
     }
 
+    // Tecla del teclado físico. Acumula dígitos y auto-comprueba cuando ya
+    // no pueden formar un número válido más largo (modo single con tope 10),
+    // o cuando se alcanza la longitud del resultado correcto (modo multi).
+    function onPhysicalDigit(digit) {
+        if (state.finished || !state.game) return;
+        const game = state.game;
+        const next = state.currentInput + String(digit);
+        const value = parseInt(next, 10);
+
+        if (game.inputMode === 'single') {
+            const max = Math.max.apply(null, game.keypadValues);
+            if (next.length > 2 || value > max) return;
+            state.currentInput = next;
+            renderAnswer();
+            // Sólo "1" puede ser prefijo de "10"; el resto se comprueba ya.
+            if (value !== 1 || next.length === 2) checkAnswer();
+            return;
+        }
+
+        // multi
+        if (next.length > 3) return;
+        state.currentInput = next;
+        renderAnswer();
+        const targetLen = String(state.currentQuestion.result).length;
+        if (state.currentInput.length >= targetLen) checkAnswer();
+    }
+
     function checkAnswer() {
         const guess = parseInt(state.currentInput, 10);
+        if (isNaN(guess)) return;
         state.attempts++;
         const fb = $('feedback');
         if (guess === state.currentQuestion.result) {
@@ -184,41 +248,46 @@
         renderAnswer();
     }
 
+    function submitAnswer() {
+        if (state.finished) return;
+        if (state.currentInput !== '') checkAnswer();
+    }
+
     function updateHUD() {
-        $('hud-score').textContent = `${state.correct} / ${TOTAL_QUESTIONS}`;
-        const pct = (state.correct / TOTAL_QUESTIONS) * 100;
+        $('hud-score').textContent = `${state.correct} / ${state.game.total}`;
+        const pct = (state.correct / state.game.total) * 100;
         $('progress-fill').style.width = pct + '%';
     }
 
     function endGame(completed) {
         state.finished = true;
         clearInterval(state.timerId);
-        const elapsed = TIME_LIMIT_SECONDS - state.timeLeft;
+        const elapsed = state.game.timeLimit - state.timeLeft;
         const accuracy = state.attempts > 0
             ? Math.round((state.correct / state.attempts) * 100)
             : 0;
 
-        $('stat-correct').textContent = `${state.correct} / ${TOTAL_QUESTIONS}`;
+        $('stat-correct').textContent = `${state.correct} / ${state.game.total}`;
         $('stat-time').textContent = `${elapsed}s`;
         $('stat-accuracy').textContent = `${accuracy}%`;
 
-        const success = completed && state.correct === TOTAL_QUESTIONS;
+        const success = completed && state.correct === state.game.total;
+        const safeName = escapeHtml(state.playerName);
 
         if (success) {
             $('result-title').textContent = '🎉 ¡Felicidades!';
             $('result-message').innerHTML =
-                `¡Lo lograste, <strong>${escapeHtml(state.playerName)}</strong>! ` +
-                `Resolviste las 60 sumas en <strong>${elapsed} segundos</strong>. ` +
+                `¡Lo lograste, <strong>${safeName}</strong>! ` +
+                `Resolviste las ${state.game.total} ${state.game.title.toLowerCase()} en ` +
+                `<strong>${elapsed} segundos</strong>. ` +
                 `¡Eres una estrella de las matemáticas! ⭐`;
             launchConfetti();
         } else {
             $('result-title').textContent = '💪 ¡Casi lo tienes!';
-            const reason = state.timeLeft <= 0
-                ? 'Se acabó el tiempo'
-                : 'Aún te quedan sumas';
+            const reason = state.timeLeft <= 0 ? 'Se acabó el tiempo' : 'Aún te quedaban retos';
             $('result-message').innerHTML =
-                `${reason}, <strong>${escapeHtml(state.playerName)}</strong>. ` +
-                `Conseguiste <strong>${state.correct}</strong> sumas correctas. ` +
+                `${reason}, <strong>${safeName}</strong>. ` +
+                `Conseguiste <strong>${state.correct}</strong> aciertos. ` +
                 `¡Inténtalo otra vez, seguro que lo consigues! 🚀`;
         }
 
@@ -231,7 +300,7 @@
         return div.innerHTML;
     }
 
-    // === Confeti simple ===
+    // === Confeti ===
     function launchConfetti() {
         const canvas = $('confetti');
         const ctx = canvas.getContext('2d');
@@ -264,26 +333,37 @@
                 ctx.restore();
             });
             frame++;
-            if (frame < max) {
-                requestAnimationFrame(tick);
-            } else {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
+            if (frame < max) requestAnimationFrame(tick);
+            else ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
         tick();
     }
 
     // === Eventos ===
     function bindEvents() {
-        $('btn-start').addEventListener('click', startGame);
-        $('player-name').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') startGame();
+        // Tarjetas de juego en la pantalla de bienvenida
+        document.querySelectorAll('.game-card').forEach((card) => {
+            card.addEventListener('click', () => startGame(card.dataset.game));
         });
+
+        $('player-name').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.querySelector('.game-card').focus();
+            }
+        });
+
         $('btn-clear').addEventListener('click', clearInput);
+        $('btn-ok').addEventListener('click', submitAnswer);
+
         $('btn-retry').addEventListener('click', () => {
-            // Mantenemos el nombre del jugador
+            if (state.game) startGame(state.game.id);
+        });
+        $('btn-menu').addEventListener('click', () => {
+            clearInterval(state.timerId);
+            state.finished = true;
+            showScreen('welcome');
             $('player-name').value = state.playerName;
-            startGame();
         });
         $('btn-home').addEventListener('click', () => {
             clearInterval(state.timerId);
@@ -293,7 +373,6 @@
             $('player-name').focus();
         });
 
-        // Teclado físico (números, Backspace, Enter)
         document.addEventListener('keydown', (e) => {
             if (!screens.game.classList.contains('active') || state.finished) return;
             if (/^[0-9]$/.test(e.key)) {
@@ -301,14 +380,12 @@
             } else if (e.key === 'Backspace') {
                 clearInput();
             } else if (e.key === 'Enter') {
-                if (state.currentInput !== '') checkAnswer();
+                submitAnswer();
             }
         });
     }
 
-    // === Init ===
     document.addEventListener('DOMContentLoaded', () => {
-        buildKeypad();
         bindEvents();
         $('player-name').focus();
     });
