@@ -39,6 +39,12 @@
                         <span class="game-name">Multiplicaciones Rápidas</span>
                         <span class="game-desc">40 multiplicaciones en 2 minutos<br>Tablas del 1 al 9</span>
                     </button>
+
+                    <button class="game-card" data-game="lengua" type="button">
+                        <span class="game-emoji">🔤</span>
+                        <span class="game-name">¿Mayúscula o minúscula?</span>
+                        <span class="game-desc">30 palabras en 2 minutos<br>Reglas del castellano</span>
+                    </button>
                 </div>
             </div>
         </section>
@@ -67,20 +73,12 @@
 
             <main class="question-area">
                 <div id="feedback" class="feedback"></div>
-                <div class="question" aria-live="polite">
-                    <span id="num-a" class="num">0</span>
-                    <span id="op" class="op">+</span>
-                    <span id="num-b" class="num">0</span>
-                    <span class="op">=</span>
-                    <span id="answer-display" class="num answer-slot">?</span>
+                <div id="question" class="question" aria-live="polite">
+                    <!-- generado por JS según el juego -->
                 </div>
 
                 <div class="keypad" id="keypad">
                     <!-- generado por JS según el juego -->
-                </div>
-
-                <div class="keypad-actions">
-                    <button id="btn-clear" class="btn btn-secondary btn-action">Borrar ⌫</button>
                 </div>
             </main>
         </section>
