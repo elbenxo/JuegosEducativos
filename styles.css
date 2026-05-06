@@ -306,10 +306,19 @@ html, body {
     font-size: 1rem;
 }
 
-/* Variante del teclado para 0-9 (juego de multiplicaciones) */
-.keypad.digits {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 320px;
+/* Variante del teclado: opciones a elegir (juego de multiplicaciones) */
+.keypad.options {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 420px;
+}
+.keypad.options .key {
+    padding: 26px 0;
+    font-size: 2rem;
+    background: linear-gradient(135deg, #ffd166 0%, #ff9a3c 100%);
+    box-shadow: 0 5px 0 #d4671c;
+}
+.keypad.options .key:hover {
+    background: linear-gradient(135deg, #ffc04a 0%, #ff8a2c 100%);
 }
 
 
