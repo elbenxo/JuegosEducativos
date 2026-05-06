@@ -324,7 +324,7 @@
                 fb.className = 'feedback';
                 state.currentIndex++;
                 nextQuestion();
-            }, 1100);
+            }, 450);
         }
     }
 
