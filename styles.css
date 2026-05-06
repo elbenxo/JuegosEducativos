@@ -60,6 +60,44 @@ html, body {
 }
 
 /* === Reglas === */
+.section-heading {
+    margin: 28px 0 14px;
+    font-size: 1.2rem;
+    color: var(--bg-2);
+}
+
+.game-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.game-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 22px 16px;
+    border: 3px solid transparent;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ffe8a3 0%, #ffd166 100%);
+    box-shadow: 0 6px 0 #d4a027, var(--shadow);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    font-family: inherit;
+    color: var(--text);
+}
+.game-card:nth-child(2) {
+    background: linear-gradient(135deg, #c5e1ff 0%, #6dd5ed 100%);
+    box-shadow: 0 6px 0 #2193b0, var(--shadow);
+}
+.game-card:hover { transform: translateY(-3px); }
+.game-card:active { transform: translateY(2px); }
+.game-emoji { font-size: 2.4rem; }
+.game-name { font-size: 1.2rem; font-weight: bold; }
+.game-desc { font-size: 0.9rem; color: #444; line-height: 1.4; }
+
 .rules {
     display: flex;
     flex-wrap: wrap;
@@ -254,6 +292,26 @@ html, body {
 .key:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--bg-2); }
 
 .btn-clear { margin-top: 16px; padding: 10px 20px; font-size: 1rem; }
+
+.keypad-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+.btn-action {
+    margin-top: 0;
+    padding: 12px 22px;
+    font-size: 1rem;
+}
+
+/* Variante del teclado para 0-9 (juego de multiplicaciones) */
+.keypad.digits {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 320px;
+}
+
 
 /* === Resultado === */
 .result-card .title { font-size: clamp(3rem, 9vw, 5rem); }
