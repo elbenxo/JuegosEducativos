@@ -4,11 +4,12 @@ Guía rápida del proyecto para futuras sesiones de Claude Code.
 
 ## Qué es
 
-Web estática de juegos educativos para niños, con tres minijuegos contra reloj:
+Web estática de juegos educativos para niños, con cuatro minijuegos contra reloj:
 
 - **Sumas Rápidas** (60 sumas en 2 min, sumandos 0–9, resultado ≤ 10).
 - **Multiplicaciones Rápidas** (40 multiplicaciones en 2 min, factores 1–9, opción múltiple con 4 botones).
 - **¿Mayúscula o minúscula?** (30 palabras en 2 min, dos botones con la palabra escrita en sus dos formas).
+- **Fill the sentence** (25 oraciones en 2:30 min, inglés: 2 huecos por oración, pool de 6 palabras).
 
 Sin dependencias, sin build. Tres archivos: `index.html`, `styles.css`, `script.js`.
 
@@ -40,6 +41,8 @@ Todo gira en torno al objeto `GAMES` en `script.js`. Cada juego define:
 | `renderQuestion(q, container)` | rellena `#question` con HTML específico del juego.                    |
 | `getKeypadValues(q)`           | devuelve los botones a mostrar. Pueden ser números o `{label, value}`. |
 | `formatAnswer(q)`              | string que se muestra al fallar tras "❌ Era ".                         |
+
+`renderQuestion` recibe un tercer parámetro `picks` (array de respuestas dadas hasta ahora). En juegos de respuesta única se ignora; en juegos multi-pick (cuando `q.result` es un array) sirve para repintar la pregunta a medida que el jugador va eligiendo.
 
 El bucle común (`nextQuestion`, `onAnswer`, `endGame`, etc.) es agnóstico al juego.
 

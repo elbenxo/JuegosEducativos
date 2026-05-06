@@ -96,6 +96,10 @@ html, body {
     background: linear-gradient(135deg, #d4f4dd 0%, #80d49e 100%);
     box-shadow: 0 6px 0 #3a8c54, var(--shadow);
 }
+.game-card:nth-child(4) {
+    background: linear-gradient(135deg, #f4d4ee 0%, #c97bd0 100%);
+    box-shadow: 0 6px 0 #7d3c8a, var(--shadow);
+}
 .game-card:hover { transform: translateY(-3px); }
 .game-card:active { transform: translateY(2px); }
 .game-emoji { font-size: 2.4rem; }
@@ -380,6 +384,55 @@ html, body {
     margin-top: 6px;
     font-size: 1.1rem;
     color: #555;
+}
+
+/* === Pregunta de oración en inglés === */
+.en-sentence {
+    font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+    font-weight: bold;
+    line-height: 1.6;
+    color: var(--text);
+    padding: 8px 12px;
+    text-align: center;
+}
+.en-blank {
+    display: inline-block;
+    min-width: 70px;
+    padding: 0 10px;
+    margin: 0 4px;
+    border-bottom: 4px solid #bbb;
+    color: #888;
+}
+.en-blank-active {
+    border-color: var(--accent-dark);
+    color: var(--accent-dark);
+    animation: pulse 1.2s ease-in-out infinite;
+}
+.en-blank-filled {
+    border-color: var(--success);
+    color: var(--success);
+    background: #e9fbef;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Variante del teclado: pool de palabras (juego de inglés) */
+.keypad.words {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 540px;
+    gap: 12px;
+}
+.keypad.words .key {
+    padding: 18px 8px;
+    font-size: 1.3rem;
+    background: linear-gradient(135deg, #f4d4ee 0%, #c97bd0 100%);
+    color: var(--text);
+    box-shadow: 0 5px 0 #7d3c8a;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.1;
+}
+.keypad.words .key:hover {
+    background: linear-gradient(135deg, #ecc0e3 0%, #b86bc0 100%);
 }
 
 
