@@ -690,6 +690,12 @@
             showScreen('welcome');
             $('player-name').value = state.playerName;
         });
+        $('btn-back').addEventListener('click', () => {
+            clearInterval(state.timerId);
+            state.finished = true;
+            showScreen('welcome');
+            $('player-name').value = state.playerName;
+        });
         $('btn-home').addEventListener('click', () => {
             clearInterval(state.timerId);
             state.finished = true;
