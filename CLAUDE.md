@@ -4,12 +4,14 @@ Guía rápida del proyecto para futuras sesiones de Claude Code.
 
 ## Qué es
 
-Web estática de juegos educativos para niños, con cuatro minijuegos contra reloj:
+Web estática de juegos educativos para niños, con seis minijuegos contra reloj:
 
 - **Sumas Rápidas** (60 sumas en 2 min, sumandos 0–9, resultado ≤ 10).
 - **Multiplicaciones Rápidas** (40 multiplicaciones en 2 min, factores 1–9, opción múltiple con 4 botones).
 - **¿Mayúscula o minúscula?** (30 palabras en 2 min, dos botones con la palabra escrita en sus dos formas).
 - **Fill the sentence** (25 oraciones en 2:30 min, inglés: 2 huecos por oración, pool de 6 palabras).
+- **Present Simple o Continuous** (25 oraciones en 2:30 min, inglés: elegir la forma correcta del verbo entre 4 opciones, con palabras clave como pista).
+- **Las preguntas Wh-** (25 preguntas en 2:30 min, inglés: elegir la palabra interrogativa correcta —What, Where, Who, When, Why, How— a partir de la respuesta dada como pista).
 
 Sin dependencias, sin build. Tres archivos: `index.html`, `styles.css`, `script.js`.
 

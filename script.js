@@ -262,6 +262,262 @@
           pool: ['girl', 'is', 'are', 'dress', 'school', 'red'] },
     ];
 
+    // === Oraciones para el juego de Present Simple vs Present Continuous ===
+    // Cada oración tiene un hueco (___) y el verbo entre paréntesis como pista.
+    // El niño elige la forma correcta entre 4 opciones. Las palabras clave
+    // ("now", "right now", "Look!", "at the moment" → continuous;
+    //  "always", "every day", "usually", "on Sundays" → simple) ayudan a decidir.
+    const VERB_SENTENCES = [
+        // --- Present continuous (acción que ocurre ahora) ---
+        { text: 'Look! The baby ___ (cry) right now.',
+          correct: 'is crying', options: ['is crying', 'cries', 'crying', 'are crying'] },
+        { text: 'Listen! The birds ___ (sing) in the tree.',
+          correct: 'are singing', options: ['are singing', 'sing', 'is singing', 'sings'] },
+        { text: 'Right now I ___ (eat) an ice cream.',
+          correct: 'am eating', options: ['am eating', 'eat', 'is eating', 'eating'] },
+        { text: 'Look at Tom! He ___ (run) very fast.',
+          correct: 'is running', options: ['is running', 'runs', 'run', 'are running'] },
+        { text: 'The children ___ (play) in the park now.',
+          correct: 'are playing', options: ['are playing', 'play', 'is playing', 'plays'] },
+        { text: 'Be quiet! Mum ___ (sleep) at the moment.',
+          correct: 'is sleeping', options: ['is sleeping', 'sleeps', 'sleep', 'are sleeping'] },
+        { text: 'Look! It ___ (rain) outside now.',
+          correct: 'is raining', options: ['is raining', 'rains', 'rain', 'are raining'] },
+        { text: 'We ___ (watch) a film right now.',
+          correct: 'are watching', options: ['are watching', 'watch', 'is watching', 'watches'] },
+        { text: 'She ___ (wear) a red dress today.',
+          correct: 'is wearing', options: ['is wearing', 'wears', 'wear', 'are wearing'] },
+        { text: 'Dad ___ (cook) dinner at the moment.',
+          correct: 'is cooking', options: ['is cooking', 'cooks', 'cook', 'are cooking'] },
+        { text: 'The dog ___ (swim) in the lake now.',
+          correct: 'is swimming', options: ['is swimming', 'swims', 'swim', 'are swimming'] },
+        { text: 'I ___ (do) my homework right now.',
+          correct: 'am doing', options: ['am doing', 'do', 'does', 'is doing'] },
+        { text: 'They ___ (have) fun on the swings now.',
+          correct: 'are having', options: ['are having', 'have', 'has', 'is having'] },
+        { text: 'Look! Grandpa ___ (read) the newspaper now.',
+          correct: 'is reading', options: ['is reading', 'reads', 'read', 'are reading'] },
+
+        // --- Present simple (rutinas y hechos) ---
+        { text: 'Every morning I ___ (brush) my teeth.',
+          correct: 'brush', options: ['brush', 'brushes', 'am brushing', 'brushing'] },
+        { text: 'My dad always ___ (drink) coffee.',
+          correct: 'drinks', options: ['drinks', 'drink', 'is drinking', 'drinking'] },
+        { text: 'We ___ (go) to school every day.',
+          correct: 'go', options: ['go', 'goes', 'are going', 'going'] },
+        { text: 'My friend ___ (live) in Madrid.',
+          correct: 'lives', options: ['lives', 'live', 'is living', 'living'] },
+        { text: 'Cats ___ (like) milk.',
+          correct: 'like', options: ['like', 'likes', 'are liking', 'liking'] },
+        { text: 'He never ___ (eat) fish.',
+          correct: 'eats', options: ['eats', 'eat', 'is eating', 'eating'] },
+        { text: 'The sun ___ (rise) in the morning.',
+          correct: 'rises', options: ['rises', 'rise', 'is rising', 'rising'] },
+        { text: 'On Sundays we ___ (visit) my grandma.',
+          correct: 'visit', options: ['visit', 'visits', 'are visiting', 'visiting'] },
+        { text: 'My sister ___ (play) tennis every week.',
+          correct: 'plays', options: ['plays', 'play', 'is playing', 'playing'] },
+        { text: 'I usually ___ (walk) to the park.',
+          correct: 'walk', options: ['walk', 'walks', 'am walking', 'walking'] },
+        { text: 'Birds ___ (fly) south in winter.',
+          correct: 'fly', options: ['fly', 'flies', 'are flying', 'flying'] },
+        { text: 'My mum ___ (work) in a hospital.',
+          correct: 'works', options: ['works', 'work', 'is working', 'working'] },
+
+        // --- Verbo "to be" ---
+        { text: 'Today it ___ (be) sunny.',
+          correct: 'is', options: ['is', 'are', 'am', 'be'] },
+        { text: 'We ___ (be) at the park now.',
+          correct: 'are', options: ['are', 'is', 'am', 'be'] },
+
+        // --- Más present continuous ---
+        { text: 'Look! My brother ___ (draw) a picture now.',
+          correct: 'is drawing', options: ['is drawing', 'draws', 'drawing', 'are drawing'] },
+        { text: 'Right now the cat ___ (climb) the tree.',
+          correct: 'is climbing', options: ['is climbing', 'climbs', 'climb', 'are climbing'] },
+        { text: 'Listen! Someone ___ (knock) at the door.',
+          correct: 'is knocking', options: ['is knocking', 'knocks', 'knock', 'are knocking'] },
+        { text: 'The students ___ (write) a test at the moment.',
+          correct: 'are writing', options: ['are writing', 'write', 'is writing', 'writes'] },
+        { text: 'Look! The plane ___ (fly) over our house now.',
+          correct: 'is flying', options: ['is flying', 'flies', 'fly', 'are flying'] },
+        { text: 'I ___ (drink) a glass of milk right now.',
+          correct: 'am drinking', options: ['am drinking', 'drink', 'is drinking', 'drinking'] },
+        { text: 'She ___ (dance) on the stage now.',
+          correct: 'is dancing', options: ['is dancing', 'dances', 'dance', 'are dancing'] },
+        { text: 'We ___ (wait) for the bus at the moment.',
+          correct: 'are waiting', options: ['are waiting', 'wait', 'is waiting', 'waits'] },
+        { text: 'Look! The dog ___ (chase) the ball now.',
+          correct: 'is chasing', options: ['is chasing', 'chases', 'chase', 'are chasing'] },
+        { text: 'My parents ___ (talk) on the phone right now.',
+          correct: 'are talking', options: ['are talking', 'talk', 'is talking', 'talks'] },
+        { text: 'He ___ (paint) the wall at the moment.',
+          correct: 'is painting', options: ['is painting', 'paints', 'paint', 'are painting'] },
+        { text: 'The baby ___ (smile) at us now.',
+          correct: 'is smiling', options: ['is smiling', 'smiles', 'smile', 'are smiling'] },
+        { text: 'Look! It ___ (snow) outside now.',
+          correct: 'is snowing', options: ['is snowing', 'snows', 'snow', 'are snowing'] },
+        { text: 'They ___ (build) a sandcastle on the beach now.',
+          correct: 'are building', options: ['are building', 'build', 'is building', 'builds'] },
+        { text: 'I ___ (listen) to music right now.',
+          correct: 'am listening', options: ['am listening', 'listen', 'is listening', 'listening'] },
+        { text: 'The teacher ___ (explain) the lesson now.',
+          correct: 'is explaining', options: ['is explaining', 'explains', 'explain', 'are explaining'] },
+        { text: 'Right now we ___ (have) lunch in the garden.',
+          correct: 'are having', options: ['are having', 'have', 'has', 'is having'] },
+        { text: 'Look! Sara ___ (ride) her bike now.',
+          correct: 'is riding', options: ['is riding', 'rides', 'ride', 'are riding'] },
+        { text: 'The boys ___ (swim) in the pool at the moment.',
+          correct: 'are swimming', options: ['are swimming', 'swim', 'is swimming', 'swims'] },
+        { text: 'My sister ___ (make) a cake right now.',
+          correct: 'is making', options: ['is making', 'makes', 'make', 'are making'] },
+        { text: 'Be careful! You ___ (stand) on my foot now.',
+          correct: 'are standing', options: ['are standing', 'stand', 'is standing', 'stands'] },
+        { text: 'Look! The fish ___ (jump) out of the water now.',
+          correct: 'is jumping', options: ['is jumping', 'jumps', 'jump', 'are jumping'] },
+        { text: 'My friends and I ___ (watch) a cartoon right now.',
+          correct: 'are watching', options: ['are watching', 'watch', 'is watching', 'watches'] },
+        { text: 'Shh! The baby ___ (sleep) in his room now.',
+          correct: 'is sleeping', options: ['is sleeping', 'sleeps', 'sleep', 'are sleeping'] },
+
+        // --- Más present simple ---
+        { text: 'My grandpa ___ (read) the newspaper every day.',
+          correct: 'reads', options: ['reads', 'read', 'is reading', 'reading'] },
+        { text: 'We always ___ (have) dinner at eight.',
+          correct: 'have', options: ['have', 'has', 'are having', 'having'] },
+        { text: 'She ___ (speak) three languages.',
+          correct: 'speaks', options: ['speaks', 'speak', 'is speaking', 'speaking'] },
+        { text: 'Dogs ___ (bark) at strangers.',
+          correct: 'bark', options: ['bark', 'barks', 'are barking', 'barking'] },
+        { text: 'The shop ___ (open) at nine every morning.',
+          correct: 'opens', options: ['opens', 'open', 'is opening', 'opening'] },
+        { text: 'I ___ (play) the guitar on Saturdays.',
+          correct: 'play', options: ['play', 'plays', 'am playing', 'playing'] },
+        { text: 'He usually ___ (catch) the early train.',
+          correct: 'catches', options: ['catches', 'catch', 'is catching', 'catching'] },
+        { text: 'My mum ___ (teach) maths at school.',
+          correct: 'teaches', options: ['teaches', 'teach', 'is teaching', 'teaching'] },
+        { text: 'Penguins ___ (live) in cold places.',
+          correct: 'live', options: ['live', 'lives', 'are living', 'living'] },
+        { text: 'We ___ (watch) a film every Friday.',
+          correct: 'watch', options: ['watch', 'watches', 'are watching', 'watching'] },
+        { text: 'She never ___ (drink) coffee at night.',
+          correct: 'drinks', options: ['drinks', 'drink', 'is drinking', 'drinking'] },
+        { text: 'The moon ___ (go) around the Earth.',
+          correct: 'goes', options: ['goes', 'go', 'is going', 'going'] },
+        { text: 'My friends ___ (meet) at the park after school.',
+          correct: 'meet', options: ['meet', 'meets', 'are meeting', 'meeting'] },
+        { text: 'He ___ (do) his homework every evening.',
+          correct: 'does', options: ['does', 'do', 'is doing', 'doing'] },
+        { text: 'Ice ___ (melt) in the sun.',
+          correct: 'melts', options: ['melts', 'melt', 'is melting', 'melting'] },
+        { text: 'I ___ (wash) my hands before lunch.',
+          correct: 'wash', options: ['wash', 'washes', 'am washing', 'washing'] },
+        { text: 'Bees ___ (make) honey.',
+          correct: 'make', options: ['make', 'makes', 'are making', 'making'] },
+        { text: 'My dad ___ (drive) to work every morning.',
+          correct: 'drives', options: ['drives', 'drive', 'is driving', 'driving'] },
+        { text: 'The library ___ (close) at six.',
+          correct: 'closes', options: ['closes', 'close', 'is closing', 'closing'] },
+        { text: 'We ___ (study) English on Mondays.',
+          correct: 'study', options: ['study', 'studies', 'are studying', 'studying'] },
+        { text: 'My cat always ___ (sleep) all day.',
+          correct: 'sleeps', options: ['sleeps', 'sleep', 'is sleeping', 'sleeping'] },
+        { text: 'They ___ (walk) to school every day.',
+          correct: 'walk', options: ['walk', 'walks', 'are walking', 'walking'] },
+        { text: 'The baby ___ (cry) every night.',
+          correct: 'cries', options: ['cries', 'cry', 'is crying', 'crying'] },
+        { text: 'Spiders ___ (have) eight legs.',
+          correct: 'have', options: ['have', 'has', 'are having', 'having'] },
+
+        // --- Más verbo "to be" y "have got" ---
+        { text: 'My brother ___ (be) ten years old.',
+          correct: 'is', options: ['is', 'are', 'am', 'be'] },
+        { text: 'They ___ (be) my best friends.',
+          correct: 'are', options: ['are', 'is', 'am', 'be'] },
+        { text: 'I ___ (be) very happy today.',
+          correct: 'am', options: ['am', 'is', 'are', 'be'] },
+        { text: 'She ___ (have got) long brown hair.',
+          correct: 'has got', options: ['has got', 'have got', 'is having', 'got'] },
+        { text: 'We ___ (have got) a big garden.',
+          correct: 'have got', options: ['have got', 'has got', 'are having', 'got'] },
+        { text: 'You ___ (be) my favourite teacher.',
+          correct: 'are', options: ['are', 'is', 'am', 'be'] },
+        { text: 'My shoes ___ (be) under the bed.',
+          correct: 'are', options: ['are', 'is', 'am', 'be'] },
+        { text: 'My dog ___ (have got) a long tail.',
+          correct: 'has got', options: ['has got', 'have got', 'is having', 'got'] },
+    ];
+
+    // === Preguntas para el juego de las Wh- questions ===
+    // Cada pregunta tiene un hueco inicial (___) y una respuesta como pista.
+    // El niño elige la palabra interrogativa correcta entre 4 opciones.
+    const WH_WORDS = ['What', 'Where', 'Who', 'When', 'Why', 'How'];
+    const WH_SENTENCES = [
+        // --- What ---
+        { text: '___ is he watching?', clue: 'A game show.', correct: 'What' },
+        { text: '___ are they reading?', clue: 'A magazine.', correct: 'What' },
+        { text: '___ is your favourite colour?', clue: 'Blue.', correct: 'What' },
+        { text: '___ do you want for lunch?', clue: 'A sandwich.', correct: 'What' },
+        { text: '___ is she cooking?', clue: 'Pasta.', correct: 'What' },
+        { text: '___ are you doing?', clue: 'My homework.', correct: 'What' },
+        { text: '___ is your name?', clue: 'My name is Lisa.', correct: 'What' },
+        { text: '___ time is it?', clue: "It's three o'clock.", correct: 'What' },
+        { text: '___ does the cat want?', clue: 'Some milk.', correct: 'What' },
+        { text: '___ is in the box?', clue: 'A toy car.', correct: 'What' },
+        { text: '___ are you eating?', clue: 'An apple.', correct: 'What' },
+
+        // --- Where ---
+        { text: '___ are they sitting?', clue: 'In the classroom.', correct: 'Where' },
+        { text: '___ are we walking?', clue: 'To the shopping mall.', correct: 'Where' },
+        { text: '___ do you live?', clue: 'In Madrid.', correct: 'Where' },
+        { text: '___ is my bag?', clue: 'Under the table.', correct: 'Where' },
+        { text: '___ are the children playing?', clue: 'In the park.', correct: 'Where' },
+        { text: '___ does she work?', clue: 'In a hospital.', correct: 'Where' },
+        { text: '___ is the dog?', clue: 'In the garden.', correct: 'Where' },
+        { text: '___ are you going?', clue: 'To the beach.', correct: 'Where' },
+        { text: '___ did you buy that hat?', clue: 'At the market.', correct: 'Where' },
+        { text: '___ is the cat hiding?', clue: 'Behind the sofa.', correct: 'Where' },
+
+        // --- Who ---
+        { text: '___ is she talking to?', clue: 'Her sister.', correct: 'Who' },
+        { text: '___ is he listening to?', clue: 'His friend.', correct: 'Who' },
+        { text: '___ is your best friend?', clue: 'Anna is.', correct: 'Who' },
+        { text: '___ made this cake?', clue: 'My mum did.', correct: 'Who' },
+        { text: '___ is knocking at the door?', clue: 'The postman.', correct: 'Who' },
+        { text: '___ are you waiting for?', clue: 'My brother.', correct: 'Who' },
+        { text: '___ lives next door?', clue: 'An old man.', correct: 'Who' },
+        { text: '___ is that boy?', clue: 'He is my cousin.', correct: 'Who' },
+        { text: '___ won the game?', clue: 'Our team did.', correct: 'Who' },
+
+        // --- When ---
+        { text: '___ do you get up?', clue: "At seven o'clock.", correct: 'When' },
+        { text: '___ is your birthday?', clue: 'In June.', correct: 'When' },
+        { text: '___ do they have lunch?', clue: 'At noon.', correct: 'When' },
+        { text: '___ does the film start?', clue: 'At eight.', correct: 'When' },
+        { text: '___ do you do your homework?', clue: 'After school.', correct: 'When' },
+        { text: '___ is the party?', clue: 'On Saturday.', correct: 'When' },
+        { text: '___ does winter begin?', clue: 'In December.', correct: 'When' },
+        { text: '___ do you brush your teeth?', clue: 'Before bed.', correct: 'When' },
+
+        // --- Why ---
+        { text: '___ is the baby crying?', clue: 'Because he is hungry.', correct: 'Why' },
+        { text: '___ are you so happy?', clue: "Because it's my birthday.", correct: 'Why' },
+        { text: '___ is she running?', clue: 'Because she is late.', correct: 'Why' },
+        { text: '___ do you like summer?', clue: 'Because it is warm.', correct: 'Why' },
+        { text: '___ are they laughing?', clue: 'Because the clown is funny.', correct: 'Why' },
+        { text: '___ is he tired?', clue: 'Because he ran a lot.', correct: 'Why' },
+
+        // --- How ---
+        { text: '___ are you?', clue: "I'm fine, thanks.", correct: 'How' },
+        { text: '___ old are you?', clue: "I'm ten years old.", correct: 'How' },
+        { text: '___ do you go to school?', clue: 'By bus.', correct: 'How' },
+        { text: '___ is the weather today?', clue: "It's sunny.", correct: 'How' },
+        { text: '___ many apples are there?', clue: 'There are five.', correct: 'How' },
+        { text: '___ does she feel?', clue: 'She feels happy.', correct: 'How' },
+        { text: '___ do you spell your name?', clue: 'L-I-S-A.', correct: 'How' },
+    ];
+
     // === Catálogo de juegos ===
     const GAMES = {
         sumas: {
@@ -413,6 +669,68 @@
                 let i = 0;
                 return q.text.replace(/___/g, () => q.result[i++]);
             },
+        },
+
+        verbos: {
+            id: 'verbos',
+            title: 'Present Simple o Continuous',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'verbs',
+            generate(prev) {
+                let pick;
+                do {
+                    pick = VERB_SENTENCES[Math.floor(Math.random() * VERB_SENTENCES.length)];
+                } while (prev && prev.text === pick.text);
+                return {
+                    text: pick.text,
+                    options: shuffle(pick.options.slice()),
+                    result: pick.correct,
+                };
+            },
+            renderQuestion(q, container) {
+                // El hueco "___" se resalta; el verbo entre paréntesis queda como pista.
+                const html = escapeHtml(q.text)
+                    .replace('___', '<span class="en-blank en-blank-active">_____</span>');
+                container.innerHTML = `<div class="en-sentence">${html}</div>`;
+            },
+            getKeypadValues(q) {
+                return q.options.map((w) => ({ label: w, value: w }));
+            },
+            formatAnswer(q) { return q.result; },
+        },
+
+        preguntas: {
+            id: 'preguntas',
+            title: 'Las preguntas Wh-',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'wh',
+            generate(prev) {
+                let pick;
+                do {
+                    pick = WH_SENTENCES[Math.floor(Math.random() * WH_SENTENCES.length)];
+                } while (prev && prev.text === pick.text);
+                // 4 opciones: la correcta + 3 distractores del resto de Wh-.
+                const others = shuffle(WH_WORDS.filter((w) => w !== pick.correct)).slice(0, 3);
+                return {
+                    text: pick.text,
+                    clue: pick.clue,
+                    options: shuffle([pick.correct, ...others]),
+                    result: pick.correct,
+                };
+            },
+            renderQuestion(q, container) {
+                const html = escapeHtml(q.text)
+                    .replace('___', '<span class="en-blank en-blank-active">_____</span>');
+                container.innerHTML =
+                    `<div class="en-sentence">${html}</div>` +
+                    `<div class="wq-clue">💬 ${escapeHtml(q.clue)}</div>`;
+            },
+            getKeypadValues(q) {
+                return q.options.map((w) => ({ label: w, value: w }));
+            },
+            formatAnswer(q) { return q.result; },
         },
     };
 
