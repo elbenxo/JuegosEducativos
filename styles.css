@@ -455,6 +455,26 @@ html, body {
     background: linear-gradient(135deg, #ecc0e3 0%, #b86bc0 100%);
 }
 
+/* Variante del teclado: formas verbales (Present Simple o Continuous) */
+.keypad.verbs {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 520px;
+    gap: 14px;
+}
+.keypad.verbs .key {
+    padding: 22px 10px;
+    font-size: clamp(1.2rem, 4vw, 1.7rem);
+    background: linear-gradient(135deg, #bfe7ff 0%, #4aa3d4 100%);
+    color: var(--text);
+    box-shadow: 0 5px 0 #2b6e96;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.1;
+}
+.keypad.verbs .key:hover {
+    background: linear-gradient(135deg, #a9ddff 0%, #3c93c4 100%);
+}
+
 
 /* === Resultado === */
 .result-card .title { font-size: clamp(3rem, 9vw, 5rem); }

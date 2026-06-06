@@ -262,6 +262,75 @@
           pool: ['girl', 'is', 'are', 'dress', 'school', 'red'] },
     ];
 
+    // === Oraciones para el juego de Present Simple vs Present Continuous ===
+    // Cada oración tiene un hueco (___) y el verbo entre paréntesis como pista.
+    // El niño elige la forma correcta entre 4 opciones. Las palabras clave
+    // ("now", "right now", "Look!", "at the moment" → continuous;
+    //  "always", "every day", "usually", "on Sundays" → simple) ayudan a decidir.
+    const VERB_SENTENCES = [
+        // --- Present continuous (acción que ocurre ahora) ---
+        { text: 'Look! The baby ___ (cry) right now.',
+          correct: 'is crying', options: ['is crying', 'cries', 'crying', 'are crying'] },
+        { text: 'Listen! The birds ___ (sing) in the tree.',
+          correct: 'are singing', options: ['are singing', 'sing', 'is singing', 'sings'] },
+        { text: 'Right now I ___ (eat) an ice cream.',
+          correct: 'am eating', options: ['am eating', 'eat', 'is eating', 'eating'] },
+        { text: 'Look at Tom! He ___ (run) very fast.',
+          correct: 'is running', options: ['is running', 'runs', 'run', 'are running'] },
+        { text: 'The children ___ (play) in the park now.',
+          correct: 'are playing', options: ['are playing', 'play', 'is playing', 'plays'] },
+        { text: 'Be quiet! Mum ___ (sleep) at the moment.',
+          correct: 'is sleeping', options: ['is sleeping', 'sleeps', 'sleep', 'are sleeping'] },
+        { text: 'Look! It ___ (rain) outside now.',
+          correct: 'is raining', options: ['is raining', 'rains', 'rain', 'are raining'] },
+        { text: 'We ___ (watch) a film right now.',
+          correct: 'are watching', options: ['are watching', 'watch', 'is watching', 'watches'] },
+        { text: 'She ___ (wear) a red dress today.',
+          correct: 'is wearing', options: ['is wearing', 'wears', 'wear', 'are wearing'] },
+        { text: 'Dad ___ (cook) dinner at the moment.',
+          correct: 'is cooking', options: ['is cooking', 'cooks', 'cook', 'are cooking'] },
+        { text: 'The dog ___ (swim) in the lake now.',
+          correct: 'is swimming', options: ['is swimming', 'swims', 'swim', 'are swimming'] },
+        { text: 'I ___ (do) my homework right now.',
+          correct: 'am doing', options: ['am doing', 'do', 'does', 'is doing'] },
+        { text: 'They ___ (have) fun on the swings now.',
+          correct: 'are having', options: ['are having', 'have', 'has', 'is having'] },
+        { text: 'Look! Grandpa ___ (read) the newspaper now.',
+          correct: 'is reading', options: ['is reading', 'reads', 'read', 'are reading'] },
+
+        // --- Present simple (rutinas y hechos) ---
+        { text: 'Every morning I ___ (brush) my teeth.',
+          correct: 'brush', options: ['brush', 'brushes', 'am brushing', 'brushing'] },
+        { text: 'My dad always ___ (drink) coffee.',
+          correct: 'drinks', options: ['drinks', 'drink', 'is drinking', 'drinking'] },
+        { text: 'We ___ (go) to school every day.',
+          correct: 'go', options: ['go', 'goes', 'are going', 'going'] },
+        { text: 'My friend ___ (live) in Madrid.',
+          correct: 'lives', options: ['lives', 'live', 'is living', 'living'] },
+        { text: 'Cats ___ (like) milk.',
+          correct: 'like', options: ['like', 'likes', 'are liking', 'liking'] },
+        { text: 'He never ___ (eat) fish.',
+          correct: 'eats', options: ['eats', 'eat', 'is eating', 'eating'] },
+        { text: 'The sun ___ (rise) in the morning.',
+          correct: 'rises', options: ['rises', 'rise', 'is rising', 'rising'] },
+        { text: 'On Sundays we ___ (visit) my grandma.',
+          correct: 'visit', options: ['visit', 'visits', 'are visiting', 'visiting'] },
+        { text: 'My sister ___ (play) tennis every week.',
+          correct: 'plays', options: ['plays', 'play', 'is playing', 'playing'] },
+        { text: 'I usually ___ (walk) to the park.',
+          correct: 'walk', options: ['walk', 'walks', 'am walking', 'walking'] },
+        { text: 'Birds ___ (fly) south in winter.',
+          correct: 'fly', options: ['fly', 'flies', 'are flying', 'flying'] },
+        { text: 'My mum ___ (work) in a hospital.',
+          correct: 'works', options: ['works', 'work', 'is working', 'working'] },
+
+        // --- Verbo "to be" ---
+        { text: 'Today it ___ (be) sunny.',
+          correct: 'is', options: ['is', 'are', 'am', 'be'] },
+        { text: 'We ___ (be) at the park now.',
+          correct: 'are', options: ['are', 'is', 'am', 'be'] },
+    ];
+
     // === Catálogo de juegos ===
     const GAMES = {
         sumas: {
@@ -413,6 +482,35 @@
                 let i = 0;
                 return q.text.replace(/___/g, () => q.result[i++]);
             },
+        },
+
+        verbos: {
+            id: 'verbos',
+            title: 'Present Simple o Continuous',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'verbs',
+            generate(prev) {
+                let pick;
+                do {
+                    pick = VERB_SENTENCES[Math.floor(Math.random() * VERB_SENTENCES.length)];
+                } while (prev && prev.text === pick.text);
+                return {
+                    text: pick.text,
+                    options: shuffle(pick.options.slice()),
+                    result: pick.correct,
+                };
+            },
+            renderQuestion(q, container) {
+                // El hueco "___" se resalta; el verbo entre paréntesis queda como pista.
+                const html = escapeHtml(q.text)
+                    .replace('___', '<span class="en-blank en-blank-active">_____</span>');
+                container.innerHTML = `<div class="en-sentence">${html}</div>`;
+            },
+            getKeypadValues(q) {
+                return q.options.map((w) => ({ label: w, value: w }));
+            },
+            formatAnswer(q) { return q.result; },
         },
     };
 
