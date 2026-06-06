@@ -475,6 +475,36 @@ html, body {
     background: linear-gradient(135deg, #a9ddff 0%, #3c93c4 100%);
 }
 
+/* Línea de pista (respuesta) del juego de preguntas Wh- */
+.wq-clue {
+    margin-top: 14px;
+    font-size: clamp(1.1rem, 3.5vw, 1.5rem);
+    font-weight: bold;
+    color: #555;
+    background: #f7f9fb;
+    border-radius: 14px;
+    padding: 10px 18px;
+    display: inline-block;
+}
+
+/* Variante del teclado: palabras interrogativas (juego de preguntas Wh-) */
+.keypad.wh {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 460px;
+    gap: 14px;
+}
+.keypad.wh .key {
+    padding: 24px 10px;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    font-weight: bold;
+    background: linear-gradient(135deg, #ffd0e0 0%, #f0729f 100%);
+    color: var(--text);
+    box-shadow: 0 5px 0 #c23e6e;
+}
+.keypad.wh .key:hover {
+    background: linear-gradient(135deg, #ffbcd3 0%, #e8628f 100%);
+}
+
 
 /* === Resultado === */
 .result-card .title { font-size: clamp(3rem, 9vw, 5rem); }

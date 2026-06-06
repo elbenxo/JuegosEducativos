@@ -449,6 +449,75 @@
           correct: 'has got', options: ['has got', 'have got', 'is having', 'got'] },
     ];
 
+    // === Preguntas para el juego de las Wh- questions ===
+    // Cada pregunta tiene un hueco inicial (___) y una respuesta como pista.
+    // El niño elige la palabra interrogativa correcta entre 4 opciones.
+    const WH_WORDS = ['What', 'Where', 'Who', 'When', 'Why', 'How'];
+    const WH_SENTENCES = [
+        // --- What ---
+        { text: '___ is he watching?', clue: 'A game show.', correct: 'What' },
+        { text: '___ are they reading?', clue: 'A magazine.', correct: 'What' },
+        { text: '___ is your favourite colour?', clue: 'Blue.', correct: 'What' },
+        { text: '___ do you want for lunch?', clue: 'A sandwich.', correct: 'What' },
+        { text: '___ is she cooking?', clue: 'Pasta.', correct: 'What' },
+        { text: '___ are you doing?', clue: 'My homework.', correct: 'What' },
+        { text: '___ is your name?', clue: 'My name is Lisa.', correct: 'What' },
+        { text: '___ time is it?', clue: "It's three o'clock.", correct: 'What' },
+        { text: '___ does the cat want?', clue: 'Some milk.', correct: 'What' },
+        { text: '___ is in the box?', clue: 'A toy car.', correct: 'What' },
+        { text: '___ are you eating?', clue: 'An apple.', correct: 'What' },
+
+        // --- Where ---
+        { text: '___ are they sitting?', clue: 'In the classroom.', correct: 'Where' },
+        { text: '___ are we walking?', clue: 'To the shopping mall.', correct: 'Where' },
+        { text: '___ do you live?', clue: 'In Madrid.', correct: 'Where' },
+        { text: '___ is my bag?', clue: 'Under the table.', correct: 'Where' },
+        { text: '___ are the children playing?', clue: 'In the park.', correct: 'Where' },
+        { text: '___ does she work?', clue: 'In a hospital.', correct: 'Where' },
+        { text: '___ is the dog?', clue: 'In the garden.', correct: 'Where' },
+        { text: '___ are you going?', clue: 'To the beach.', correct: 'Where' },
+        { text: '___ did you buy that hat?', clue: 'At the market.', correct: 'Where' },
+        { text: '___ is the cat hiding?', clue: 'Behind the sofa.', correct: 'Where' },
+
+        // --- Who ---
+        { text: '___ is she talking to?', clue: 'Her sister.', correct: 'Who' },
+        { text: '___ is he listening to?', clue: 'His friend.', correct: 'Who' },
+        { text: '___ is your best friend?', clue: 'Anna is.', correct: 'Who' },
+        { text: '___ made this cake?', clue: 'My mum did.', correct: 'Who' },
+        { text: '___ is knocking at the door?', clue: 'The postman.', correct: 'Who' },
+        { text: '___ are you waiting for?', clue: 'My brother.', correct: 'Who' },
+        { text: '___ lives next door?', clue: 'An old man.', correct: 'Who' },
+        { text: '___ is that boy?', clue: 'He is my cousin.', correct: 'Who' },
+        { text: '___ won the game?', clue: 'Our team did.', correct: 'Who' },
+
+        // --- When ---
+        { text: '___ do you get up?', clue: "At seven o'clock.", correct: 'When' },
+        { text: '___ is your birthday?', clue: 'In June.', correct: 'When' },
+        { text: '___ do they have lunch?', clue: 'At noon.', correct: 'When' },
+        { text: '___ does the film start?', clue: 'At eight.', correct: 'When' },
+        { text: '___ do you do your homework?', clue: 'After school.', correct: 'When' },
+        { text: '___ is the party?', clue: 'On Saturday.', correct: 'When' },
+        { text: '___ does winter begin?', clue: 'In December.', correct: 'When' },
+        { text: '___ do you brush your teeth?', clue: 'Before bed.', correct: 'When' },
+
+        // --- Why ---
+        { text: '___ is the baby crying?', clue: 'Because he is hungry.', correct: 'Why' },
+        { text: '___ are you so happy?', clue: "Because it's my birthday.", correct: 'Why' },
+        { text: '___ is she running?', clue: 'Because she is late.', correct: 'Why' },
+        { text: '___ do you like summer?', clue: 'Because it is warm.', correct: 'Why' },
+        { text: '___ are they laughing?', clue: 'Because the clown is funny.', correct: 'Why' },
+        { text: '___ is he tired?', clue: 'Because he ran a lot.', correct: 'Why' },
+
+        // --- How ---
+        { text: '___ are you?', clue: "I'm fine, thanks.", correct: 'How' },
+        { text: '___ old are you?', clue: "I'm ten years old.", correct: 'How' },
+        { text: '___ do you go to school?', clue: 'By bus.', correct: 'How' },
+        { text: '___ is the weather today?', clue: "It's sunny.", correct: 'How' },
+        { text: '___ many apples are there?', clue: 'There are five.', correct: 'How' },
+        { text: '___ does she feel?', clue: 'She feels happy.', correct: 'How' },
+        { text: '___ do you spell your name?', clue: 'L-I-S-A.', correct: 'How' },
+    ];
+
     // === Catálogo de juegos ===
     const GAMES = {
         sumas: {
@@ -624,6 +693,39 @@
                 const html = escapeHtml(q.text)
                     .replace('___', '<span class="en-blank en-blank-active">_____</span>');
                 container.innerHTML = `<div class="en-sentence">${html}</div>`;
+            },
+            getKeypadValues(q) {
+                return q.options.map((w) => ({ label: w, value: w }));
+            },
+            formatAnswer(q) { return q.result; },
+        },
+
+        preguntas: {
+            id: 'preguntas',
+            title: 'Las preguntas Wh-',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'wh',
+            generate(prev) {
+                let pick;
+                do {
+                    pick = WH_SENTENCES[Math.floor(Math.random() * WH_SENTENCES.length)];
+                } while (prev && prev.text === pick.text);
+                // 4 opciones: la correcta + 3 distractores del resto de Wh-.
+                const others = shuffle(WH_WORDS.filter((w) => w !== pick.correct)).slice(0, 3);
+                return {
+                    text: pick.text,
+                    clue: pick.clue,
+                    options: shuffle([pick.correct, ...others]),
+                    result: pick.correct,
+                };
+            },
+            renderQuestion(q, container) {
+                const html = escapeHtml(q.text)
+                    .replace('___', '<span class="en-blank en-blank-active">_____</span>');
+                container.innerHTML =
+                    `<div class="en-sentence">${html}</div>` +
+                    `<div class="wq-clue">💬 ${escapeHtml(q.clue)}</div>`;
             },
             getKeypadValues(q) {
                 return q.options.map((w) => ({ label: w, value: w }));
