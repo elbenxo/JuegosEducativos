@@ -13,6 +13,15 @@ Web estática de juegos educativos para niños, con seis minijuegos contra reloj
 - **Present Simple o Continuous** (25 oraciones en 2:30 min, inglés: elegir la forma correcta del verbo entre 4 opciones, con palabras clave como pista).
 - **Las preguntas Wh-** (25 preguntas en 2:30 min, inglés: elegir la palabra interrogativa correcta —What, Where, Who, When, Why, How— a partir de la respuesta dada como pista).
 
+Sección aparte **"📘 Inglés – Unit 1: Our friends (examen)"** (4º primaria, libro de texto, Unit 1):
+
+- **Hair and faces** (`u1pelo`, 25 en 2:30): cara SVG generada (pelo dark/fair, short/long, curly/straight, gafas, pecas); "What does she look like?", "Has he got glasses?" y vocabulario es↔en.
+- **Has / Have got** (`u1havegot`, 25 en 2:30): huecos has/have, 's/'ve, hasn't/haven't, Has/Have…?, short answers, What does/do … look like?
+- **Me too / Me neither** (`u1metoo`, 30 en 2:30): responder que a ti también te pasa.
+- **The tallest!** (`u1super`, 25 en 2:30): superlativos, serie tall–taller–the tallest, adjetivos es↔en, "Who's the tallest?" con datos, canción.
+- **Monkey & Elephant** (`u1story`, 20 en 2:30): comprensión de la historia (quién, True/False, orden, por qué).
+- **Repaso Unit 1** (`u1mix`, 30 en 3:00): mezcla aleatoria de los cinco anteriores.
+
 Sin dependencias, sin build. Tres archivos: `index.html`, `styles.css`, `script.js`.
 
 ## Estructura
@@ -43,6 +52,10 @@ Todo gira en torno al objeto `GAMES` en `script.js`. Cada juego define:
 | `renderQuestion(q, container)` | rellena `#question` con HTML específico del juego.                    |
 | `getKeypadValues(q)`           | devuelve los botones a mostrar. Pueden ser números o `{label, value}`. |
 | `formatAnswer(q)`              | string que se muestra al fallar tras "❌ Era ".                         |
+
+Una pregunta puede llevar su propio `keypadClass` (tiene prioridad sobre el del juego); los juegos de la Unit 1 lo usan para alternar `u1` (2 columnas), `u1-two` (2 botones grandes) y `u1-wide` (1 columna para frases largas).
+
+Los juegos `u1*` comparten formato de pregunta (`{key, hint, text, clue, face, pron, keypadClass, options, result, answer}`) creado con `u1Question()` y se pintan con `u1Render()`; `noRepeat()` evita repetir la `key` anterior. `u1mix` guarda en `q.sub` el juego que generó la pregunta y delega en él render, teclado y respuesta.
 
 `renderQuestion` recibe un tercer parámetro `picks` (array de respuestas dadas hasta ahora). En juegos de respuesta única se ignora; en juegos multi-pick (cuando `q.result` es un array) sirve para repintar la pregunta a medida que el jugador va eligiendo.
 
