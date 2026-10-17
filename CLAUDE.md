@@ -20,7 +20,15 @@ Sección aparte **"📘 Inglés – Unit 1: Our friends (examen)"** (4º primari
 - **Me too / Me neither** (`u1metoo`, 30 en 2:30): responder que a ti también te pasa.
 - **The tallest!** (`u1super`, 25 en 2:30): superlativos, serie tall–taller–the tallest, adjetivos es↔en, "Who's the tallest?" con datos, canción.
 - **Monkey & Elephant** (`u1story`, 20 en 2:30): comprensión de la historia (quién, True/False, orden, por qué).
-- **Repaso Unit 1** (`u1mix`, 30 en 3:00): mezcla aleatoria de los cinco anteriores.
+- **What's the link?** (`u1link`, 20 en 2:30): 3 caras con nombre que comparten exactamente dos rasgos; elegir la pareja ("curly hair / freckles").
+- **Guess who!** (`u1guess`, 20 en 2:30): 4 caras con nombre y 1–3 pistas ("She's got dark hair. She hasn't got glasses."); botones "Is it Ella?". Sólo una cara cumple todas.
+- **True or false?** (`u1truefalse`, 30 en 2:30): cara(s) + frase con 's got / hasn't got / 've got / haven't got (también "I've got…"), ~50 % verdaderas.
+- **Line up!** (`u1lineup`, 25 en 2:30): 3–4 niños con barras (cm, años, segundos, kg); "Who's the tallest/…?" o "Ben is ___." (superlativo).
+- **Order the sentence** (`u1order`, 15 en 3:00, multi-pick): tocar las palabras en orden (254 frases de la unidad).
+- **Spell it!** (`u1spell`, 30 en 2:30): elegir la palabra bien escrita (45 palabras, con cara para las de pelo).
+- **Story order** (`u1seq`, 15 en 3:00): ordenar 5 o 3 eventos de la historia (multi-pick), "Which happens first/last?", "A or B?" y next/before.
+- **Repaso Unit 1** (`u1mix`, 30 en 3:00): mezcla aleatoria de todos los juegos u1 de respuesta única.
+- **Examen Unit 1** (`u1exam`, 40 en 5:00): simulacro con todos los juegos u1, incluidos los multi-pick.
 
 Sin dependencias, sin build. Tres archivos: `index.html`, `styles.css`, `script.js`.
 
@@ -55,7 +63,9 @@ Todo gira en torno al objeto `GAMES` en `script.js`. Cada juego define:
 
 Una pregunta puede llevar su propio `keypadClass` (tiene prioridad sobre el del juego); los juegos de la Unit 1 lo usan para alternar `u1` (2 columnas), `u1-two` (2 botones grandes) y `u1-wide` (1 columna para frases largas).
 
-Los juegos `u1*` comparten formato de pregunta (`{key, hint, text, clue, face, pron, keypadClass, options, result, answer}`) creado con `u1Question()` y se pintan con `u1Render()`; `noRepeat()` evita repetir la `key` anterior. `u1mix` guarda en `q.sub` el juego que generó la pregunta y delega en él render, teclado y respuesta.
+Los juegos `u1*` comparten formato de pregunta (`{key, hint, text, clue, face, pron, keypadClass, options, result, answer}`) creado con `u1Question()` y se pintan con `u1Render()`; `noRepeat()` evita repetir la `key` anterior. Campos extra que pinta `u1Render`: `people` (caras con nombre, `peopleHtml`), `lineup` (barras, `lineupHtml`) y `ab` (dos secuencias A/B). `u1mix` y `u1exam` se crean con `u1MixGame()`: guardan en `q.sub` el juego que generó la pregunta, delegan en él render, teclado y respuesta, y no repiten juego dos veces seguidas.
+
+Los multi-pick de la Unit 1 (`u1order`, y `u1seq` en su variante de ordenar) marcan `q.pickOnce`: `buildKeypad` desactiva cada botón al pulsarlo. Como en `english`, la respuesta se comprueba cuando se han elegido todas las piezas.
 
 `renderQuestion` recibe un tercer parámetro `picks` (array de respuestas dadas hasta ahora). En juegos de respuesta única se ignora; en juegos multi-pick (cuando `q.result` es un array) sirve para repintar la pregunta a medida que el jugador va eligiendo.
 

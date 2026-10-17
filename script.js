@@ -556,7 +556,13 @@
         let html = '';
         if (q.hint) html += `<div class="u1-hint">${escapeHtml(q.hint)}</div>`;
         if (q.face) html += faceSvgs(q.face, q.pron === 'They' ? 2 : 1);
+        if (q.people) html += peopleHtml(q.people);
+        if (q.lineup) html += lineupHtml(q.lineup);
         if (q.text) html += `<div class="en-sentence">${u1Blank(q.text)}</div>`;
+        if (q.ab) {
+            html += '<div class="u1-ab">' + q.ab.map((list, i) =>
+                `<div><b>${'AB'[i]}</b> ${list.map(escapeHtml).join(' ➜ ')}</div>`).join('') + '</div>';
+        }
         if (q.clue) html += `<div class="wq-clue">💬 ${u1Blank(q.clue)}</div>`;
         container.innerHTML = html;
     }
@@ -565,7 +571,7 @@
     const u1Answer = (q) => q.answer;
 
     // --- Hair and faces ---
-    const HAIR_DIMS = ['length', 'type', 'colour'];   // orden natural de adjetivos
+    const HAIR_DIMS = ['length', 'colour', 'type'];   // orden natural: "long dark hair", "dark curly hair"
     const HAIR_VALUES = {
         length: ['short', 'long'],
         type: ['curly', 'straight'],
@@ -878,14 +884,18 @@
     const METOO_STATEMENTS = (() => {
         const out = [];
         ['freckles', 'glasses', 'curly hair', 'straight hair', 'long hair', 'short hair', 'dark hair',
-            'fair hair', 'a dog', 'a cat', 'a bike', 'a sister', 'a brother'].forEach((x) => {
+            'fair hair', 'a dog', 'a cat', 'a bike', 'a sister', 'a brother', 'a rabbit', 'a hamster',
+            'a skateboard', 'a ball', 'a big family', 'a cousin', 'a pet'].forEach((x) => {
             out.push([`I've got ${x}.`, true], [`I haven't got ${x}.`, false]);
         });
-        ['tall', 'short', 'strong', 'brave', 'fast', 'funny', 'young', 'happy', 'hungry', 'tired']
+        ['tall', 'short', 'strong', 'brave', 'fast', 'funny', 'young', 'happy', 'hungry', 'tired',
+            'small', 'big', 'thirsty', 'sleepy', 'angry', 'cold', 'hot', 'good at English']
             .forEach((x) => { out.push([`I'm ${x}.`, true], [`I'm not ${x}.`, false]); });
-        ['swim', 'climb', 'run fast', 'ride a bike', 'sing', 'dance', 'skate', 'play football']
+        ['swim', 'climb', 'run fast', 'ride a bike', 'sing', 'dance', 'skate', 'play football',
+            'climb trees', 'jump', 'read', 'draw', 'swim fast', 'play tennis', 'play the piano']
             .forEach((x) => { out.push([`I can ${x}.`, true], [`I can't ${x}.`, false]); });
-        ['mangoes', 'bananas', 'ice cream', 'football', 'cats', 'dogs']
+        ['mangoes', 'bananas', 'ice cream', 'football', 'cats', 'dogs', 'apples', 'pizza', 'chocolate',
+            'monkeys', 'elephants', 'school', 'English', 'swimming', 'music']
             .forEach((x) => { out.push([`I like ${x}.`, true], [`I don't like ${x}.`, false]); });
         return out;
     })();
@@ -1047,10 +1057,21 @@
         ['___ climbs and helps Elephant.', 'Monkey'],
         ['___ swims and helps Monkey.', 'Elephant'],
         ['___ says: "You\'re different, but you\'re a team!"', 'Owl'],
-        ['___ want the mango.', 'Both'],
         ['___ are angry at first.', 'Both'],
         ['___ learn a lesson.', 'Both'],
         ['___ are a good team.', 'Both'],
+        ['___ swims.', 'Elephant'],
+        ['___ climbs.', 'Monkey'],
+        ['___ helps Monkey.', 'Elephant'],
+        ['___ helps Elephant.', 'Monkey'],
+        ["___ can climb, but can't swim.", 'Monkey'],
+        ["___ can swim, but can't climb.", 'Elephant'],
+        ['___ is fast and can climb.', 'Monkey'],
+        ['___ is strong and can swim.', 'Elephant'],
+        ['___ go and get the mango.', 'Both'],
+        ['___ are friends.', 'Both'],
+        ['___ are different.', 'Both'],
+        ['___ say: "Yes! We\'re a good team!"', 'Both'],
     ];
     const STORY_TF = [
         ['Monkey is fast.', true],
@@ -1065,8 +1086,8 @@
         ["Elephant can't swim.", false],
         ['Owl has got an idea.', true],
         ['Monkey has got an idea.', false],
-        ['They want the mango.', true],
-        ['They want a banana.', false],
+        ['Owl says: "Stop!"', true],
+        ['They get a banana.', false],
         ['Monkey and Elephant are angry at first.', true],
         ['Monkey and Elephant are angry at the end.', false],
         ['Monkey and Elephant are a good team.', true],
@@ -1078,6 +1099,22 @@
         ['Monkey and Elephant are the same.', false],
         ['Monkey and Elephant are different.', true],
         ['Monkey and Elephant learn a lesson.', true],
+        ['Elephant has got an idea.', false],
+        ['Two friends are angry.', true],
+        ['Monkey and Elephant are friends.', true],
+        ['Elephant swims and helps Monkey.', true],
+        ['Monkey swims and helps Elephant.', false],
+        ['Monkey climbs and helps Elephant.', true],
+        ['Elephant climbs and helps Monkey.', false],
+        ['Monkey and Elephant are a bad team.', false],
+        ['Monkey is fast and Elephant is strong.', true],
+        ['Monkey can climb and Elephant can swim.', true],
+        ['Monkey can swim and Elephant can climb.', false],
+        ['Monkey and Elephant can swim.', false],
+        ['Monkey and Elephant can climb.', false],
+        ['Monkey and Elephant go and get the mango.', true],
+        ['Monkey and Elephant learn a lesson at the end.', true],
+        ['At the end, Monkey and Elephant say: "We\'re a good team!"', true],
     ];
     const STORY_SEQ = [
         'Two friends are angry.',
@@ -1091,7 +1128,7 @@
             ['Because they are the same.', 'Because they are angry.', "Because they can't swim."]],
         ['What does Owl say?', "You're different, but you're a team!",
             ["You're the same, so you're a team!", "You're angry. Go away!", "You can't get the mango!"]],
-        ['What do Monkey and Elephant want?', '🥭 The mango.',
+        ['What do Monkey and Elephant get?', '🥭 The mango.',
             ['🍌 A banana.', '🍎 An apple.', '🍓 A strawberry.']],
         ['Why does Monkey need Elephant?', "Because Monkey can't swim.",
             ["Because Monkey can't climb.", 'Because Monkey is angry.', 'Because Monkey is strong.']],
@@ -1099,15 +1136,59 @@
             ["Because Elephant can't swim.", 'Because Elephant is fast.', 'Because Elephant is small.']],
         ['What do Monkey and Elephant say at the end?', "Yes! We're a good team!",
             ["We're the same!", 'Go away!', "We can't get the mango!"]],
+        ['Who has got an idea?', '🦉 Owl.', ['🐒 Monkey.', '🐘 Elephant.', '🥭 The mango.']],
+        ['How does Elephant help Monkey?', 'Elephant swims.',
+            ['Elephant climbs.', 'Elephant sings.', 'Elephant runs fast.']],
+        ['How does Monkey help Elephant?', 'Monkey climbs.',
+            ['Monkey swims.', 'Monkey sings.', 'Monkey is strong.']],
+        ['How are Monkey and Elephant at the start of the story?', '😠 Angry.',
+            ['😀 Happy.', '😴 Tired.', '🤝 A good team.']],
+        ['How are Monkey and Elephant at the end?', '🤝 A good team.',
+            ['😠 Angry.', '😴 Tired.', '😢 Sad.']],
+        ['Is Monkey fast or strong?', 'Monkey is fast.', ['Monkey is strong.']],
+        ['Is Elephant fast or strong?', 'Elephant is strong.', ['Elephant is fast.']],
+        ['Can Monkey swim?', "No. Monkey can't swim.", ['Yes. Monkey can swim.']],
+        ['Can Elephant swim?', 'Yes. Elephant can swim.', ["No. Elephant can't swim."]],
+        ['Can Monkey climb?', 'Yes. Monkey can climb.', ["No. Monkey can't climb."]],
+        ['Can Elephant climb?', "No. Elephant can't climb.", ['Yes. Elephant can climb.']],
     ];
+
+    function storySeqQuestion() {
+        const mode = pickOne(['next', 'next', 'before', 'first', 'last']);
+        let i;
+        let answer;
+        let text;
+        let clue = '';
+        if (mode === 'next') {
+            i = Math.floor(Math.random() * 4);
+            answer = STORY_SEQ[i + 1];
+            text = 'What happens next?';
+            clue = STORY_SEQ[i];
+        } else if (mode === 'before') {
+            i = 1 + Math.floor(Math.random() * 4);
+            answer = STORY_SEQ[i - 1];
+            text = 'What happens before that?';
+            clue = STORY_SEQ[i];
+        } else {
+            i = mode === 'first' ? 0 : 4;
+            answer = STORY_SEQ[i];
+            text = mode === 'first' ? 'What happens first?' : 'What happens at the end?';
+        }
+        const wrong = shuffle(STORY_SEQ.filter((s) => s !== answer && s !== clue)).slice(0, 3);
+        return u1Question({
+            key: `story-seq-${mode}-${i}`, hint: '📖 El orden de la historia', text, clue, keypadClass: 'u1-wide',
+        }, answer, wrong);
+    }
 
     function storyQuestion() {
         const r = Math.random();
         if (r < 0.3) {
             const [text, who] = pickOne(STORY_WHO_ITEMS);
+            // Owl tampoco nada ni trepa en la vida real: no se ofrece en las frases con "can".
+            const wrong = Object.keys(STORY_WHO).filter((k) => k !== who && !(k === 'Owl' && /\bcan/.test(text)));
             return u1Question({
                 key: `story-who-${text}`, hint: '¿Quién es? 🤔', text, keypadClass: 'u1',
-            }, STORY_WHO[who], Object.keys(STORY_WHO).filter((k) => k !== who).map((k) => STORY_WHO[k]));
+            }, STORY_WHO[who], wrong.map((k) => STORY_WHO[k]));
         }
         if (r < 0.65) {
             const [text, truth] = pickOne(STORY_TF);
@@ -1117,39 +1198,442 @@
                 key: `story-tf-${text}`, hint: '¿Verdadero (True) o falso (False)?', text, keypadClass: 'u1-two',
             }, truth ? T : F, [truth ? F : T]);
         }
-        if (r < 0.85) {
-            const mode = pickOne(['next', 'next', 'before', 'first', 'last']);
-            let i;
-            let answer;
-            let text;
-            let clue = '';
-            if (mode === 'next') {
-                i = Math.floor(Math.random() * 4);
-                answer = STORY_SEQ[i + 1];
-                text = 'What happens next?';
-                clue = STORY_SEQ[i];
-            } else if (mode === 'before') {
-                i = 1 + Math.floor(Math.random() * 4);
-                answer = STORY_SEQ[i - 1];
-                text = 'What happens before?';
-                clue = STORY_SEQ[i];
-            } else {
-                i = mode === 'first' ? 0 : 4;
-                answer = STORY_SEQ[i];
-                text = mode === 'first' ? 'What happens first?' : 'What happens at the end?';
-            }
-            const wrong = shuffle(STORY_SEQ.filter((s) => s !== answer && s !== clue)).slice(0, 3);
-            return u1Question({
-                key: `story-seq-${mode}-${i}`, hint: '📖 El orden de la historia', text, clue, keypadClass: 'u1-wide',
-            }, answer, wrong);
-        }
+        if (r < 0.85) return storySeqQuestion();
         const [text, answer, wrong] = pickOne(STORY_THINK);
         return u1Question({
             key: `story-think-${text}`, hint: '🤔 Piensa en la historia', text, keypadClass: 'u1-wide',
         }, answer, wrong);
     }
 
-    const U1_MIX_GAMES = ['u1pelo', 'u1havegot', 'u1metoo', 'u1super', 'u1story'];
+    // --- Niños con nombre y cara (What's the link?, Guess who!, True or false, Line up!) ---
+    const U1_KIDS = [
+        ['Sally', 'She'], ['Betsy', 'She'], ['Eva', 'She'], ['Maya', 'She'], ['Amina', 'She'],
+        ['Lucie', 'She'], ['Ella', 'She'], ['Anna', 'She'], ['Lily', 'She'],
+        ['Leo', 'He'], ['Dan', 'He'], ['Paulo', 'He'], ['Tom', 'He'], ['Jack', 'He'],
+        ['Fred', 'He'], ['Charlie', 'He'],
+    ].map(([name, Subj]) => ({ name, Subj }));
+    const pickKids = (n) => shuffle(U1_KIDS.slice()).slice(0, n);
+    const kidEmoji = (k) => (k.Subj === 'She' ? '👧' : '👦');
+
+    // Rasgos que se pueden nombrar, en el orden natural de los adjetivos.
+    const FEATURES = [
+        ...HAIR_DIMS.flatMap((dim) => HAIR_VALUES[dim].map((v) => ({ dim, v, en: `${v} hair` }))),
+        { dim: 'glasses', v: true, en: 'glasses' },
+        { dim: 'freckles', v: true, en: 'freckles' },
+    ];
+    const FACE_DIMS = [...HAIR_DIMS, 'glasses', 'freckles'];
+    const hasFeat = (face, ft) => face[ft.dim] === ft.v;
+
+    function peopleHtml(people) {
+        const cells = people.map((p) =>
+            `<figure class="u1-person">${faceSvg(p.face)}<figcaption>${escapeHtml(p.name)}</figcaption></figure>`);
+        return `<div class="u1-people n${people.length}">${cells.join('')}</div>`;
+    }
+
+    function distinctFaces(n) {
+        const out = [];
+        while (out.length < n) {
+            const f = randomFace();
+            if (!out.some((g) => faceKey(g) === faceKey(f))) out.push(f);
+        }
+        return out;
+    }
+
+    // Tres caras que comparten exactamente dos rasgos; en las otras dimensiones no coinciden
+    // las tres (así tampoco comparten "no tener gafas", y la respuesta es única).
+    function linkQuestion() {
+        let a;
+        let b;
+        do { [a, b] = shuffle(FEATURES.slice()).slice(0, 2); } while (a.dim === b.dim);
+        if (FEATURES.indexOf(a) > FEATURES.indexOf(b)) [a, b] = [b, a];
+        let faces;
+        do {
+            faces = [0, 1, 2].map(() => Object.assign(randomFace(), { [a.dim]: a.v, [b.dim]: b.v }));
+        } while (new Set(faces.map(faceKey)).size < 3 ||
+            FACE_DIMS.some((d) => d !== a.dim && d !== b.dim && faces.every((f) => f[d] === faces[0][d])));
+        const pairs = [];
+        FEATURES.forEach((x, i) => FEATURES.slice(i + 1).forEach((y) => { if (x.dim !== y.dim) pairs.push([x, y]); }));
+        const label = ([x, y]) => `${x.en} / ${y.en}`;
+        const others = pairs.filter(([x, y]) => !(x === a && y === b));
+        const near = shuffle(others.filter((p) => p.includes(a) || p.includes(b))).slice(0, 2);
+        const far = shuffle(others.filter((p) => !near.includes(p))).slice(0, 1);
+        const kids = pickKids(3);
+        return u1Question({
+            key: `link-${label([a, b])}-${faces.map(faceKey).join()}`,
+            hint: '🔗 ¿Qué tienen los tres en común?',
+            text: "What's the link?",
+            people: faces.map((face, i) => ({ face, name: kids[i].name })),
+            keypadClass: 'u1',
+        }, label([a, b]), [...near, ...far].map(label));
+    }
+
+    // Pista = { dim, v, pos }: pos indica "has got" (true) o "hasn't got" (false) el rasgo dim=v.
+    const clueMatches = (face, c) => (face[c.dim] === c.v) === c.pos;
+
+    function clueSentences(clues, p) {
+        const out = [];
+        const hairPos = clues.filter((c) => c.pos && HAIR_DIMS.includes(c.dim))
+            .sort((x, y) => HAIR_DIMS.indexOf(x.dim) - HAIR_DIMS.indexOf(y.dim));
+        // Sólo se juntan dos adjetivos si uno es la longitud ("long curly hair", "short fair hair"); nunca tres.
+        const groups = hairPos[0] && hairPos[0].dim === 'length' && hairPos.length > 1
+            ? [hairPos.slice(0, 2), ...hairPos.slice(2).map((c) => [c])]
+            : hairPos.map((c) => [c]);
+        groups.forEach((g) => out.push(`${p.got} ${g.map((c) => c.v).join(' ')} hair.`));
+        clues.filter((c) => c.pos && !HAIR_DIMS.includes(c.dim)).forEach((c) => out.push(`${p.got} ${c.dim}.`));
+        clues.filter((c) => !c.pos).forEach((c) =>
+            out.push(`${p.not} ${HAIR_DIMS.includes(c.dim) ? `${c.v} hair` : c.dim}.`));
+        return out.join(' ');
+    }
+
+    function guessQuestion() {
+        for (;;) {
+            const faces = distinctFaces(4);
+            const kids = pickKids(4);
+            const t = Math.floor(Math.random() * 4);
+            const target = faces[t];
+            const facts = [];
+            HAIR_DIMS.forEach((dim) => {
+                facts.push({ dim, v: target[dim], pos: true }, { dim, v: otherHair(dim, target[dim]), pos: false });
+            });
+            ['glasses', 'freckles'].forEach((dim) => facts.push({ dim, v: true, pos: target[dim] }));
+            for (let tries = 0; tries < 30; tries++) {
+                const k = pickOne([1, 2, 2, 2, 3, 3]);
+                const clues = [];
+                shuffle(facts.slice()).forEach((c) => {
+                    if (clues.length < k && !clues.some((x) => x.dim === c.dim)) clues.push(c);
+                });
+                if (faces.filter((f) => clues.every((c) => clueMatches(f, c))).length !== 1) continue;
+                const name = kids[t].name;
+                return {
+                    key: `guess-${faces.map(faceKey).join()}-${t}`,
+                    hint: '🕵️ Guess who! ¿Quién es?',
+                    people: faces.map((face, i) => ({ face, name: kids[i].name })),
+                    text: clueSentences(clues, u1Pron(kids[t].Subj)),
+                    clues,
+                    keypadClass: 'u1',
+                    options: kids.map((kid) => ({ label: `Is it ${kid.name}?`, value: kid.name })),
+                    result: name,
+                    answer: name,
+                };
+            }
+        }
+    }
+
+    function tfStatement(face, p) {
+        const kind = pickOne(['hair1', 'hair2', 'hairNot', 'acc', 'accNot', 'mixed']);
+        const dim = pickOne(HAIR_DIMS);
+        const v = pickOne(HAIR_VALUES[dim]);
+        const acc = pickOne(['glasses', 'freckles']);
+        if (kind === 'hair1') return { text: `${p.got} ${v} hair.`, truth: face[dim] === v };
+        if (kind === 'hair2') {
+            const dims = ['length', pickOne(['type', 'colour'])];
+            const vals = dims.map((d) => pickOne(HAIR_VALUES[d]));
+            return { text: `${p.got} ${vals.join(' ')} hair.`, truth: dims.every((d, i) => face[d] === vals[i]) };
+        }
+        if (kind === 'hairNot') return { text: `${p.not} ${v} hair.`, truth: face[dim] !== v };
+        if (kind === 'acc') {
+            if (Math.random() < 0.25) {
+                return { text: `${p.got} glasses and freckles.`, truth: face.glasses && face.freckles };
+            }
+            return { text: `${p.got} ${acc}.`, truth: face[acc] };
+        }
+        if (kind === 'accNot') return { text: `${p.not} ${acc}.`, truth: !face[acc] };
+        return { text: `${p.got} ${v} hair and ${acc}.`, truth: face[dim] === v && face[acc] };
+    }
+
+    const U1_TRUE = { label: 'True ✅', value: 'true' };
+    const U1_FALSE = { label: 'False ❌', value: 'false' };
+
+    function trueFalseQuestion() {
+        const face = randomFace();
+        const r = Math.random();
+        let p;
+        let people;
+        if (r < 0.15) {
+            p = { Subj: 'I', got: "I've got", not: "I haven't got" };
+            people = [{ face, name: 'Me 🙋' }];
+        } else if (r < 0.45) {
+            p = U1_PRONS[2];
+            people = pickKids(2).map((k) => ({ face, name: k.name }));
+        } else {
+            const k = pickKids(1)[0];
+            p = u1Pron(k.Subj);
+            people = [{ face, name: k.name }];
+        }
+        const want = Math.random() < 0.5;
+        let s;
+        do { s = tfStatement(face, p); } while (s.truth !== want);
+        return u1Question({
+            key: `tf-${p.Subj}-${s.text}-${faceKey(face)}`,
+            hint: '👀 ¿Verdadero (True) o falso (False)?',
+            people,
+            text: s.text,
+            keypadClass: 'u1-two',
+        }, want ? U1_TRUE : U1_FALSE, [want ? U1_FALSE : U1_TRUE]);
+    }
+
+    // --- Line up! ---
+    const LINEUP_DATA = [
+        { sup: 'tallest', adj: 'tall', opp: 'shortest', unit: 'cm', min: 115, max: 150, high: true, icon: '📏',
+          hint: '📏 ¿Quién mide más?' },
+        { sup: 'shortest', adj: 'short', opp: 'tallest', unit: 'cm', min: 115, max: 150, high: false, icon: '📏',
+          hint: '📏 ¿Quién mide menos?' },
+        { sup: 'oldest', adj: 'old', opp: 'youngest', unit: 'years', min: 7, max: 12, high: true, icon: '🎂',
+          hint: '🎂 Más años = mayor (older)' },
+        { sup: 'youngest', adj: 'young', opp: 'oldest', unit: 'years', min: 7, max: 12, high: false, icon: '🎂',
+          hint: '🎂 Menos años = más joven (younger)' },
+        { sup: 'fastest', adj: 'fast', unit: 's', min: 9, max: 20, high: false, icon: '⏱️',
+          hint: '🏃 Una carrera: ¡menos segundos = más rápido!' },
+        { sup: 'strongest', adj: 'strong', unit: 'kg', min: 10, max: 40, high: true, icon: '🏋️',
+          hint: '🏋️ Levantan pesas: más kilos = más fuerte' },
+    ];
+
+    function lineupHtml(L) {
+        const cols = L.rows.map((r) =>
+            `<div class="u1-col"><span class="u1-val">${r.v} ${L.unit}</span>` +
+            `<span class="u1-bar" style="height:${r.h}px"></span>` +
+            `<span class="u1-kid">${r.emoji}</span><span class="u1-name">${escapeHtml(r.name)}</span></div>`);
+        return `<div class="u1-lineup"><span class="u1-icon">${L.icon}</span>${cols.join('')}</div>`;
+    }
+
+    function lineupQuestion() {
+        const D = pickOne(LINEUP_DATA);
+        const kids = pickKids(Math.random() < 0.5 ? 3 : 4);
+        const vals = [];
+        while (vals.length < kids.length) {
+            const v = D.min + Math.floor(Math.random() * (D.max - D.min + 1));
+            if (!vals.includes(v)) vals.push(v);
+        }
+        const lo = D.min - (D.max - D.min) * 0.4;
+        const rows = kids.map((k, i) => ({
+            name: k.name, emoji: kidEmoji(k), v: vals[i],
+            h: Math.round(20 + (100 * (vals[i] - lo)) / (D.max - lo)),
+        }));
+        const winner = kids[vals.indexOf(D.high ? Math.max(...vals) : Math.min(...vals))].name;
+        const base = {
+            hint: D.hint,
+            lineup: { icon: D.icon, unit: D.unit, rows },
+            keypadClass: 'u1',
+        };
+        if (Math.random() < 0.7) {
+            return u1Question(Object.assign(base, {
+                key: `line-who-${D.sup}-${kids.map((k) => k.name).join()}-${vals.join()}`,
+                text: `Who's the ${D.sup}?`,
+            }), winner, kids.map((k) => k.name).filter((n) => n !== winner));
+        }
+        const A = findAdj(D.adj);
+        const wrong = D.opp ? [`the ${D.opp}`, ...shuffle(A.supBad.slice()).slice(0, 2)]
+            : shuffle(A.supBad.slice()).slice(0, 3);
+        return u1Question(Object.assign(base, {
+            key: `line-is-${D.sup}-${kids.map((k) => k.name).join()}-${vals.join()}`,
+            text: `${winner} is ___.`,
+        }), A.sup, wrong);
+    }
+
+    // --- Order the sentence (multi-pick: cada toque es una palabra) ---
+    const ORDER_GROUPS = (() => {
+        const sg = [['He', 'he'], ['She', 'she'], ['Tom', 'Tom'], ['Anna', 'Anna'], ['Leo', 'Leo'], ['Ella', 'Ella']];
+        const hairPairs = [];
+        ['type', 'colour'].forEach((d2) =>
+            HAIR_VALUES.length.forEach((a) => HAIR_VALUES[d2].forEach((b) => hairPairs.push(`${a} ${b}`))));
+        const feats = FEATURES.map((f) => f.en);
+        const got = [];
+        const not = [];
+        const ask = [];
+        sg.forEach(([S, s]) => {
+            hairPairs.forEach((h) => got.push(`${S}'s got ${h} hair.`));
+            feats.forEach((f) => { not.push(`${S} hasn't got ${f}.`); ask.push(`Has ${s} got ${f}?`); });
+        });
+        hairPairs.forEach((h) => got.push(`They've got ${h} hair.`, `I've got ${h} hair.`));
+        feats.forEach((f) => {
+            not.push(`They haven't got ${f}.`, `I haven't got ${f}.`);
+            ask.push(`Have they got ${f}?`, `Have you got ${f}?`);
+        });
+        const look = sg.map(([, s]) => `What does ${s} look like?`).concat('What do they look like?',
+            'Yes, he has.', "No, he hasn't.", 'Yes, she has.', "No, she hasn't.",
+            'Yes, they have.', "No, they haven't.", 'Yes, I have.', "No, I haven't.");
+        const sup = [];
+        SUPER_ADJ.forEach((A) => sup.push(`Who's ${A.sup}?`, `He's ${A.sup}.`, `She's ${A.sup}.`));
+        const story = ['Elephant can swim.', 'Monkey can climb.', "Monkey can't swim.", "Elephant can't climb.",
+            'Monkey is fast.', 'Elephant is strong.', "We're a good team!", "Yes! We're a good team!",
+            'Owl has got an idea.', 'Two friends are angry.', 'They get the mango.'];
+        return [got, not, ask, look, sup, story];
+    })();
+
+    function orderQuestion() {
+        const sentence = pickOne(pickOne(ORDER_GROUPS));
+        const punct = sentence.slice(-1);
+        const words = sentence.slice(0, -1).split(' ');
+        let pool;
+        do { pool = shuffle(words.slice()); } while (pool.join(' ') === words.join(' '));
+        return {
+            key: `order-${sentence}`,
+            punct,
+            pool,
+            result: words,
+            pickOnce: true,
+            keypadClass: 'words',
+        };
+    }
+
+    function orderRender(q, container, picks) {
+        picks = picks || [];
+        const slots = q.result.map((w, i) => (i < picks.length
+            ? `<span class="en-blank en-blank-filled">${escapeHtml(picks[i])}</span>`
+            : `<span class="en-blank${i === picks.length ? ' en-blank-active' : ''}">__</span>`));
+        container.innerHTML = '<div class="u1-hint">🧩 Toca las palabras en orden</div>' +
+            `<div class="en-sentence u1-order">${slots.join(' ')} ${escapeHtml(q.punct)}</div>`;
+    }
+
+    // --- Spell it! ---
+    // { en, es, bad, pre/post: texto alrededor del hueco, face: rasgo a dibujar }
+    const SPELL_WORDS = [
+        { en: 'freckles', es: 'pecas', bad: ['frekles', 'freckels', 'frecles', 'freckless'], face: ['freckles', true] },
+        { en: 'glasses', es: 'gafas', bad: ['glases', 'glasess', 'glasees', 'glasis'], face: ['glasses', true] },
+        { en: 'curly', es: 'pelo rizado', bad: ['curley', 'curlly', 'kurly', 'curli'], post: ' hair', face: ['type', 'curly'] },
+        { en: 'straight', es: 'pelo liso', bad: ['strayt', 'straigth', 'staight', 'streight'], post: ' hair', face: ['type', 'straight'] },
+        { en: 'fair', es: 'pelo rubio', bad: ['faer', 'fiar', 'faire', 'fayr'], post: ' hair', face: ['colour', 'fair'] },
+        { en: 'dark', es: 'pelo moreno / oscuro', bad: ['darck', 'drak', 'dakr', 'darc'], post: ' hair', face: ['colour', 'dark'] },
+        { en: 'long', es: 'pelo largo', bad: ['lonk', 'logn', 'lonng', 'leng'], post: ' hair', face: ['length', 'long'] },
+        { en: 'short', es: 'pelo corto', bad: ['shorth', 'shrot', 'chort', 'shortt'], post: ' hair', face: ['length', 'short'] },
+        { en: 'hair', es: 'pelo', bad: ['hiar', 'haer', 'haire', 'hairr'] },
+        { en: 'face', es: 'cara', bad: ['fase', 'faec', 'feis', 'faice'] },
+        { en: 'brave', es: 'valiente', bad: ['brayve', 'brav', 'braive', 'breiv'] },
+        { en: 'strong', es: 'fuerte', bad: ['strog', 'stronge', 'strogn', 'estrong'] },
+        { en: 'young', es: 'joven', bad: ['yung', 'yong', 'younge', 'yuong'] },
+        { en: 'tall', es: 'alto', bad: ['tal', 'tawl', 'taul', 'thall'] },
+        { en: 'fast', es: 'rápido', bad: ['fasst', 'fsat', 'fazt', 'faast'] },
+        { en: 'funny', es: 'gracioso', bad: ['funy', 'funni', 'funnie', 'fuuny'] },
+        { en: 'old', es: 'viejo / mayor', bad: ['ould', 'olld', 'oeld', 'olt'] },
+        { en: 'short', es: 'bajo (de altura)', bad: ['shorth', 'shrot', 'chort', 'shoort'] },
+        { en: 'small', es: 'pequeño', bad: ['smal', 'smoll', 'smaal', 'esmall'] },
+        { en: 'big', es: 'grande', bad: ['bigg', 'bik', 'beeg', 'bigh'] },
+        { en: 'good', es: 'bueno', bad: ['gud', 'goood', 'guud', 'goud'] },
+        { en: 'tallest', es: 'el más alto', bad: ['talest', 'tallist', 'tallst', 'tallestt'], pre: 'the ' },
+        { en: 'shortest', es: 'el más bajo', bad: ['shortist', 'shorttest', 'shortst', 'shotest'], pre: 'the ' },
+        { en: 'biggest', es: 'el más grande', bad: ['bigest', 'biggist', 'bigst', 'biggst'], pre: 'the ' },
+        { en: 'smallest', es: 'el más pequeño', bad: ['smalest', 'smallist', 'smallst', 'smolest'], pre: 'the ' },
+        { en: 'funniest', es: 'el más gracioso', bad: ['funnyest', 'funiest', 'funnist', 'funyest'], pre: 'the ' },
+        { en: 'bravest', es: 'el más valiente', bad: ['bravist', 'braveest', 'bravst', 'breavest'], pre: 'the ' },
+        { en: 'best', es: 'el mejor', bad: ['bset', 'bestt', 'baest', 'besst'], pre: 'the ' },
+        { en: 'youngest', es: 'el más joven', bad: ['yungest', 'youngist', 'youngst', 'yongest'], pre: 'the ' },
+        { en: 'oldest', es: 'el mayor (el más viejo)', bad: ['oldist', 'olddest', 'odest', 'oldst'], pre: 'the ' },
+        { en: 'fastest', es: 'el más rápido', bad: ['fastist', 'fasttest', 'fastst', 'fasest'], pre: 'the ' },
+        { en: 'strongest', es: 'el más fuerte', bad: ['strongist', 'strongst', 'stronggest', 'strogest'], pre: 'the ' },
+        { en: 'monkey', es: 'mono', bad: ['monky', 'munkey', 'monkei', 'mongey'] },
+        { en: 'elephant', es: 'elefante', bad: ['elefant', 'elephent', 'eliphant', 'elefhant'] },
+        { en: 'owl', es: 'búho', bad: ['oul', 'owel', 'aul', 'owll'] },
+        { en: 'mango', es: 'mango', bad: ['mangoe', 'mangou', 'mengo', 'mangow'] },
+        { en: 'swim', es: 'nadar', bad: ['swimm', 'suim', 'swin', 'swem'] },
+        { en: 'climb', es: 'trepar', bad: ['climm', 'climbe', 'clim', 'claimb'] },
+        { en: 'team', es: 'equipo', bad: ['tiim', 'tiam', 'tem', 'teamm'] },
+        { en: 'friends', es: 'amigos', bad: ['frends', 'freinds', 'friens', 'frinds'] },
+        { en: 'angry', es: 'enfadado', bad: ['angri', 'angrey', 'angy', 'engry'] },
+        { en: 'idea', es: 'idea', bad: ['aidea', 'idia', 'ideea', 'aidia'] },
+        { en: 'different', es: 'diferente', bad: ['diferent', 'diffrent', 'differant', 'diferant'] },
+        { en: 'help', es: 'ayudar', bad: ['halp', 'hepl', 'helpe', 'jelp'] },
+        { en: 'lesson', es: 'lección', bad: ['leson', 'lesen', 'lession', 'lesonn'] },
+    ];
+
+    function spellQuestion() {
+        const W = pickOne(SPELL_WORDS);
+        let face = null;
+        if (W.face) {
+            face = randomFace();
+            face[W.face[0]] = W.face[1];
+        }
+        return u1Question({
+            key: `spell-${W.en}-${W.es}`,
+            hint: '🔤 ¿Cuál está bien escrita?',
+            face,
+            text: `${W.es} ➜ ${W.pre || ''}___${W.post || ''}`,
+            keypadClass: 'u1',
+        }, W.en, shuffle(W.bad.slice()).slice(0, 3));
+    }
+
+    // --- Story order ---
+    const SEQ_EVENTS = STORY_SEQ.map((s, i) => ({ label: `${['😠', '🥭', '🐘', '🐒', '🤝'][i]} ${s}`, value: `e${i}` }));
+
+    function seqQuestion() {
+        const r = Math.random();
+        const sortedPick = (n) => shuffle(range(0, 4)).slice(0, n).sort((a, b) => a - b);
+        if (r < 0.5) {
+            const idx = r < 0.25 ? range(0, 4) : sortedPick(3);
+            let pool;
+            do { pool = shuffle(idx.slice()); } while (pool.join() === idx.join());
+            return {
+                key: `seq-pick-${idx.join()}`,
+                hint: '📖🐒🐘🦉 Toca lo que pasa, en orden',
+                result: idx.map((i) => SEQ_EVENTS[i].value),
+                pool: pool.map((i) => SEQ_EVENTS[i]),
+                pickOnce: true,
+                keypadClass: 'u1-wide',
+            };
+        }
+        if (r < 0.7) {
+            const idx = sortedPick(pickOne([3, 4]));
+            const first = Math.random() < 0.5;
+            const ans = SEQ_EVENTS[first ? idx[0] : idx[idx.length - 1]];
+            return u1Question({
+                key: `seq-fl-${first}-${idx.join()}`,
+                hint: '📖 El orden de la historia',
+                text: first ? 'Which happens first?' : 'Which happens last?',
+                keypadClass: 'u1-wide',
+            }, ans, idx.map((i) => SEQ_EVENTS[i]).filter((e) => e !== ans));
+        }
+        if (r < 0.85) {
+            const idx = sortedPick(3);
+            let bad;
+            do { bad = shuffle(idx.slice()); } while (bad.join() === idx.join());
+            const okA = Math.random() < 0.5;
+            const A = { label: 'A', value: 'A' };
+            const B = { label: 'B', value: 'B' };
+            return u1Question({
+                key: `seq-ab-${idx.join()}-${bad.join()}`,
+                hint: '📖 ¿Cuál es el orden correcto?',
+                text: 'Which is the correct sequence? A or B?',
+                ab: [okA ? idx : bad, okA ? bad : idx].map((list) => list.map((i) => SEQ_EVENTS[i].label)),
+                keypadClass: 'u1-two',
+            }, okA ? A : B, [okA ? B : A]);
+        }
+        return storySeqQuestion();
+    }
+
+    function seqRender(q, container, picks) {
+        if (!Array.isArray(q.result)) { u1Render(q, container); return; }
+        picks = picks || [];
+        const label = (v) => SEQ_EVENTS.find((e) => e.value === v).label;
+        const items = q.result.map((_, i) => (i < picks.length
+            ? `<li class="done">${i + 1}. ${escapeHtml(label(picks[i]))}</li>`
+            : `<li class="${i === picks.length ? 'next' : ''}">${i + 1}. …</li>`));
+        container.innerHTML = `<div class="u1-hint">${escapeHtml(q.hint)}</div><ol class="u1-seq">${items.join('')}</ol>`;
+    }
+
+    const U1_MIX_GAMES = ['u1pelo', 'u1havegot', 'u1metoo', 'u1super', 'u1story',
+        'u1link', 'u1guess', 'u1truefalse', 'u1lineup', 'u1spell'];
+    const U1_EXAM_GAMES = U1_MIX_GAMES.concat('u1order', 'u1seq');
+
+    // Cada pregunta recuerda en "sub" qué juego la generó y se delega en él.
+    function u1MixGame(id, title, total, timeLimit, pool) {
+        return {
+            id,
+            title,
+            total,
+            timeLimit,
+            keypadClass: 'u1',
+            generate(prev) {
+                const sub = pickOne(pool.filter((g) => !prev || g !== prev.sub));
+                const game = GAMES[sub];
+                const q = game.generate(prev);   // noRepeat compara la key aunque cambie el juego
+                q.sub = sub;
+                if (!q.keypadClass) q.keypadClass = game.keypadClass;
+                return q;
+            },
+            renderQuestion(q, container, picks) { GAMES[q.sub].renderQuestion(q, container, picks); },
+            getKeypadValues(q) { return GAMES[q.sub].getKeypadValues(q); },
+            formatAnswer(q) { return GAMES[q.sub].formatAnswer(q); },
+        };
+    }
 
     // === Catálogo de juegos ===
     const GAMES = {
@@ -1444,25 +1928,95 @@
             formatAnswer: u1Answer,
         },
 
-        // Repaso: cada pregunta recuerda en "sub" qué juego la generó y se delega en él.
-        u1mix: {
-            id: 'u1mix',
-            title: 'Repaso Unit 1',
-            total: 30,
-            timeLimit: 180,
+        u1link: {
+            id: 'u1link',
+            title: "What's the link?",
+            total: 20,
+            timeLimit: 150,
             keypadClass: 'u1',
-            generate(prev) {
-                const sub = pickOne(U1_MIX_GAMES);
-                const game = GAMES[sub];
-                const q = game.generate(prev && prev.sub === sub ? prev : null);
-                q.sub = sub;
-                if (!q.keypadClass) q.keypadClass = game.keypadClass;
-                return q;
-            },
-            renderQuestion(q, container, picks) { GAMES[q.sub].renderQuestion(q, container, picks); },
-            getKeypadValues(q) { return GAMES[q.sub].getKeypadValues(q); },
-            formatAnswer(q) { return GAMES[q.sub].formatAnswer(q); },
+            generate(prev) { return noRepeat(linkQuestion, prev); },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
         },
+
+        u1guess: {
+            id: 'u1guess',
+            title: 'Guess who!',
+            total: 20,
+            timeLimit: 150,
+            keypadClass: 'u1',
+            generate(prev) { return noRepeat(guessQuestion, prev); },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        u1truefalse: {
+            id: 'u1truefalse',
+            title: 'True or false?',
+            total: 30,
+            timeLimit: 150,
+            keypadClass: 'u1-two',
+            generate(prev) { return noRepeat(trueFalseQuestion, prev); },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        u1lineup: {
+            id: 'u1lineup',
+            title: 'Line up!',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'u1',
+            generate(prev) { return noRepeat(lineupQuestion, prev); },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        u1order: {
+            id: 'u1order',
+            title: 'Order the sentence',
+            total: 15,
+            timeLimit: 180,
+            keypadClass: 'words',
+            generate(prev) { return noRepeat(orderQuestion, prev); },
+            renderQuestion: orderRender,
+            getKeypadValues(q) { return q.pool.map((w) => ({ label: w, value: w })); },
+            formatAnswer(q) { return q.result.join(' ') + q.punct; },
+        },
+
+        u1spell: {
+            id: 'u1spell',
+            title: 'Spell it!',
+            total: 30,
+            timeLimit: 150,
+            keypadClass: 'u1',
+            generate(prev) { return noRepeat(spellQuestion, prev); },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        u1seq: {
+            id: 'u1seq',
+            title: 'Story order',
+            total: 15,
+            timeLimit: 180,
+            keypadClass: 'u1-wide',
+            generate(prev) { return noRepeat(seqQuestion, prev); },
+            renderQuestion: seqRender,
+            getKeypadValues(q) { return q.pool || q.options; },
+            formatAnswer(q) {
+                if (!Array.isArray(q.result)) return q.answer;
+                return q.result.map((v) => SEQ_EVENTS.find((e) => e.value === v).label.split(' ')[0]).join(' ➜ ');
+            },
+        },
+
+        u1mix: u1MixGame('u1mix', 'Repaso Unit 1', 30, 180, U1_MIX_GAMES),
+        u1exam: u1MixGame('u1exam', 'Examen Unit 1', 40, 300, U1_EXAM_GAMES),
     };
 
     function range(from, to) {
@@ -1525,7 +2079,11 @@
                 btn.innerHTML =
                     `<span class="key-label">${escapeHtml(v.label)}</span>` +
                     (v.sub ? `<span class="key-sub">${escapeHtml(v.sub)}</span>` : '');
-                btn.addEventListener('click', () => onAnswer(v.value));
+                btn.addEventListener('click', () => {
+                    // En juegos de ordenar, cada palabra/evento sólo se puede usar una vez.
+                    if (question.pickOnce && !state.locked && !state.finished) btn.disabled = true;
+                    onAnswer(v.value);
+                });
             } else {
                 btn.textContent = v;
                 btn.addEventListener('click', () => onAnswer(v));
