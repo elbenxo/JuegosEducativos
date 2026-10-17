@@ -518,6 +518,639 @@
         { text: '___ do you spell your name?', clue: 'L-I-S-A.', correct: 'How' },
     ];
 
+    // === Unit 1 "Our friends" (examen de inglés de 4º) ===
+    // Todas las preguntas de estos juegos comparten formato:
+    // { key, hint, text, clue, face, pron, keypadClass, options: [{label, value}], result, answer }.
+    // "key" identifica el ítem para no repetir el anterior.
+
+    function pickOne(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function noRepeat(make, prev) {
+        let q;
+        let tries = 0;
+        do { q = make(); } while (prev && q.key === prev.key && ++tries < 50);
+        return q;
+    }
+
+    function u1Options(correct, wrong) {
+        return shuffle([correct, ...wrong].map((o) =>
+            (typeof o === 'object' ? o : { label: o, value: o })));
+    }
+
+    function u1Question(fields, correct, wrong) {
+        const c = typeof correct === 'object' ? correct : { label: correct, value: correct };
+        return Object.assign(fields, {
+            options: u1Options(c, wrong),
+            result: c.value,
+            answer: c.label,
+        });
+    }
+
+    function u1Blank(str) {
+        return escapeHtml(str).replace('___', '<span class="en-blank en-blank-active">_____</span>');
+    }
+
+    function u1Render(q, container) {
+        let html = '';
+        if (q.hint) html += `<div class="u1-hint">${escapeHtml(q.hint)}</div>`;
+        if (q.face) html += faceSvgs(q.face, q.pron === 'They' ? 2 : 1);
+        if (q.text) html += `<div class="en-sentence">${u1Blank(q.text)}</div>`;
+        if (q.clue) html += `<div class="wq-clue">💬 ${u1Blank(q.clue)}</div>`;
+        container.innerHTML = html;
+    }
+
+    const u1Keypad = (q) => q.options;
+    const u1Answer = (q) => q.answer;
+
+    // --- Hair and faces ---
+    const HAIR_DIMS = ['length', 'type', 'colour'];   // orden natural de adjetivos
+    const HAIR_VALUES = {
+        length: ['short', 'long'],
+        type: ['curly', 'straight'],
+        colour: ['dark', 'fair'],
+    };
+    const otherHair = (dim, v) => HAIR_VALUES[dim].find((x) => x !== v);
+
+    function u1Pron(Subj) {
+        const s = Subj.toLowerCase();
+        const sg = Subj !== 'They';
+        const has = sg ? 'has' : 'have';
+        const hasnt = sg ? "hasn't" : "haven't";
+        const badHas = sg ? 'have' : 'has';
+        const badHasnt = sg ? "haven't" : "hasn't";
+        const be = sg ? 'is' : 'are';
+        const bent = sg ? "isn't" : "aren't";
+        const doo = sg ? 'does' : 'do';
+        const dont = sg ? "doesn't" : "don't";
+        return {
+            Subj,
+            subj: s,
+            got: `${Subj}${sg ? "'s" : "'ve"} got`,
+            not: `${Subj} ${hasnt} got`,
+            aux: sg ? 'Has' : 'Have',
+            wh: `What ${doo} ${s} look like?`,
+            yes: `Yes, ${s} ${has}.`,
+            no: `No, ${s} ${hasnt}.`,
+            badGot: `${Subj} ${badHas} got`,
+            badNot: `${Subj} ${badHasnt} got`,
+            beNot: `${Subj} ${bent} got`,
+            wrong: [
+                `Yes, ${s} ${badHas}.`, `No, ${s} ${badHasnt}.`,
+                `Yes, ${s} ${be}.`, `No, ${s} ${bent}.`,
+                `Yes, ${s} ${doo}.`, `No, ${s} ${dont}.`,
+            ],
+        };
+    }
+    const U1_PRONS = ['He', 'She', 'They'].map(u1Pron);
+
+    const HAIR_VOCAB = [
+        ['pecas', 'freckles'],
+        ['gafas', 'glasses'],
+        ['pelo rizado', 'curly hair'],
+        ['pelo liso', 'straight hair'],
+        ['pelo rubio', 'fair hair'],
+        ['pelo moreno / oscuro', 'dark hair'],
+        ['pelo corto', 'short hair'],
+        ['pelo largo', 'long hair'],
+    ];
+
+    function randomFace() {
+        return {
+            length: pickOne(HAIR_VALUES.length),
+            type: pickOne(HAIR_VALUES.type),
+            colour: pickOne(HAIR_VALUES.colour),
+            glasses: Math.random() < 0.5,
+            freckles: Math.random() < 0.5,
+        };
+    }
+
+    function faceKey(f) {
+        return [f.length, f.type, f.colour, f.glasses ? 'g' : '-', f.freckles ? 'f' : '-'].join('.');
+    }
+
+    function circlesSvg(points, r, attrs) {
+        return points.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="${r}" ${attrs}/>`).join('');
+    }
+
+    // Cara de dibujo animado: rizado = bultos redondos, liso = contorno suave,
+    // largo = el pelo baja por debajo de las orejas hasta los hombros.
+    function faceSvg(f) {
+        const col = f.colour === 'fair' ? ['#f6c945', '#c9971a'] : ['#4b2e1a', '#26160a'];
+        const hair = `fill="${col[0]}" stroke="${col[1]}" stroke-width="1.5"`;
+        let back = '';
+        let front = '';
+        if (f.type === 'straight') {
+            if (f.length === 'long') {
+                back = `<path ${hair} d="M28,62 Q28,26 60,26 Q92,26 92,62 L97,117 Q87,121 78,115 L78,86 L42,86 L42,115 Q33,121 23,117 Z"/>`;
+            }
+            front = `<path ${hair} d="M27,72 Q25,26 60,26 Q95,26 93,72 Q89,52 75,47 Q60,55 45,47 Q31,52 27,72 Z"/>`;
+        } else {
+            if (f.length === 'long') {
+                const pts = [];
+                for (let y = 66; y <= 111; y += 9) pts.push([27, y], [93, y]);
+                pts.push([35, 108], [85, 108], [36, 116], [84, 116]);
+                back = circlesSvg(pts, 9, hair);
+            }
+            const ring = [];
+            for (let a = 180; a >= 0; a -= 20) {
+                const rad = (a * Math.PI) / 180;
+                ring.push([+(60 + 32 * Math.cos(rad)).toFixed(1), +(64 - 32 * Math.sin(rad)).toFixed(1)]);
+            }
+            const fringe = [[40, 51], [50, 48], [60, 47], [70, 48], [80, 51]];
+            front =
+                `<path fill="${col[0]}" d="M28,66 Q27,30 60,30 Q93,30 92,66 Q86,50 60,48 Q34,50 28,66 Z"/>` +
+                circlesSvg(ring, 8.5, hair) + circlesSvg(fringe, 7, hair);
+        }
+        const freckles = f.freckles
+            ? circlesSvg([[41, 82], [45, 86], [38, 87], [79, 82], [75, 86], [82, 87]], 1.8, 'fill="#b5562b"')
+            : '';
+        const glasses = f.glasses
+            ? '<g fill="rgba(255,255,255,0.35)" stroke="#1f2933" stroke-width="2.6">' +
+              '<circle cx="49" cy="71" r="8.5"/><circle cx="71" cy="71" r="8.5"/>' +
+              '<path d="M57.5,71 L62.5,71 M40.5,70 L31,67 M79.5,70 L89,67" fill="none"/></g>'
+            : '';
+        return `<svg class="u1-face" viewBox="0 0 120 125" role="img" aria-label="dibujo">` +
+            `<path d="M28,125 Q30,106 60,106 Q90,106 92,125 Z" fill="#6dd5ed"/>` +
+            `<rect x="52" y="94" width="16" height="16" fill="#f5c9a0"/>` +
+            back +
+            `<circle cx="30" cy="73" r="6" fill="#f5c9a0"/><circle cx="90" cy="73" r="6" fill="#f5c9a0"/>` +
+            `<circle cx="60" cy="71" r="30" fill="#ffdcb8"/>` +
+            freckles +
+            `<circle cx="49" cy="71" r="3.2" fill="#2c2c2c"/><circle cx="71" cy="71" r="3.2" fill="#2c2c2c"/>` +
+            `<path d="M58,78 Q60,81 62,78" fill="none" stroke="#c98a5e" stroke-width="2" stroke-linecap="round"/>` +
+            `<path d="M51,88 Q60,95 69,88" fill="none" stroke="#b03a2e" stroke-width="2.6" stroke-linecap="round"/>` +
+            glasses + front +
+            `</svg>`;
+    }
+
+    function faceSvgs(f, count) {
+        const one = faceSvg(f);
+        return `<div class="u1-faces${count > 1 ? ' two' : ''}">${count > 1 ? one + one : one}</div>`;
+    }
+
+    function peloDescribe(face, p) {
+        const kind = pickOne(['two', 'extras', 'mixed', 'contrast']);
+        let correct;
+        let all;
+        let detail = '';
+        if (kind === 'two') {
+            const dims = shuffle(HAIR_DIMS.slice()).slice(0, 2)
+                .sort((a, b) => HAIR_DIMS.indexOf(a) - HAIR_DIMS.indexOf(b));
+            const say = (a, b) => `${p.got} ${a} ${b} hair.`;
+            all = [];
+            HAIR_VALUES[dims[0]].forEach((a) => HAIR_VALUES[dims[1]].forEach((b) => all.push(say(a, b))));
+            correct = say(face[dims[0]], face[dims[1]]);
+            detail = dims.join('+');
+        } else if (kind === 'extras') {
+            const say = (g, fr) => {
+                if (g && fr) return `${p.got} glasses and freckles.`;
+                if (g) return `${p.got} glasses. ${p.not} freckles.`;
+                if (fr) return `${p.got} freckles. ${p.not} glasses.`;
+                return `${p.not} glasses or freckles.`;
+            };
+            all = [say(true, true), say(true, false), say(false, true), say(false, false)];
+            correct = say(face.glasses, face.freckles);
+        } else if (kind === 'mixed') {
+            const dim = pickOne(HAIR_DIMS);
+            const acc = pickOne(['glasses', 'freckles']);
+            const say = (v, has) => (has
+                ? `${p.got} ${v} hair and ${acc}.`
+                : `${p.got} ${v} hair. ${p.not} ${acc}.`);
+            all = [];
+            HAIR_VALUES[dim].forEach((v) => { all.push(say(v, true), say(v, false)); });
+            correct = say(face[dim], face[acc]);
+            detail = dim + '+' + acc;
+        } else {
+            const dim = pickOne(HAIR_DIMS);
+            const v = face[dim];
+            const o = otherHair(dim, v);
+            correct = `${p.got} ${v} hair. ${p.not} ${o} hair.`;
+            all = [
+                correct,
+                `${p.got} ${o} hair. ${p.not} ${v} hair.`,
+                `${p.badGot} ${v} hair. ${p.badNot} ${o} hair.`,
+                `${p.got} ${v} hair. ${p.beNot} ${o} hair.`,
+            ];
+            detail = dim;
+        }
+        return u1Question({
+            key: `pelo-desc-${kind}-${detail}-${p.Subj}-${faceKey(face)}`,
+            hint: 'Mira el dibujo 👀',
+            face,
+            pron: p.Subj,
+            text: p.wh,
+            keypadClass: 'u1-wide',
+        }, correct, all.filter((s) => s !== correct));
+    }
+
+    function peloYesNo(face, p) {
+        let feat;
+        let truth;
+        if (Math.random() < 0.4) {
+            const acc = pickOne(['glasses', 'freckles']);
+            feat = acc;
+            truth = face[acc];
+        } else {
+            const dim = pickOne(HAIR_DIMS);
+            const v = pickOne(HAIR_VALUES[dim]);
+            feat = `${v} hair`;
+            truth = face[dim] === v;
+        }
+        return u1Question({
+            key: `pelo-yn-${feat}-${p.Subj}-${faceKey(face)}`,
+            hint: 'Mira el dibujo y contesta 👀',
+            face,
+            pron: p.Subj,
+            text: `${p.aux} ${p.subj} got ${feat}?`,
+            keypadClass: 'u1',
+        }, truth ? p.yes : p.no, [truth ? p.no : p.yes, ...shuffle(p.wrong.slice()).slice(0, 2)]);
+    }
+
+    function peloVocab() {
+        const idx = Math.floor(Math.random() * HAIR_VOCAB.length);
+        const toEnglish = Math.random() < 0.6;
+        const col = toEnglish ? 1 : 0;
+        const others = shuffle(HAIR_VOCAB.filter((_, i) => i !== idx)).slice(0, 3).map((w) => w[col]);
+        return u1Question({
+            key: `pelo-voc-${idx}-${toEnglish}`,
+            hint: toEnglish ? '¿Cómo se dice en inglés?' : '¿Qué significa en castellano?',
+            text: HAIR_VOCAB[idx][1 - col],
+            keypadClass: 'u1',
+        }, HAIR_VOCAB[idx][col], others);
+    }
+
+    // --- Has / Have got ---
+    const HG_FORMS = {
+        sg: { has: 'has', hasnt: "hasn't", c: "'s", Aux: 'Has', do: 'does', be: 'is', bent: "isn't", dont: "doesn't" },
+        pl: { has: 'have', hasnt: "haven't", c: "'ve", Aux: 'Have', do: 'do', be: 'are', bent: "aren't", dont: "don't" },
+        i: { has: 'have', hasnt: "haven't", c: "'ve", Aux: 'Have', do: 'do', be: 'am', bent: 'am not', dont: "don't" },
+    };
+    const HG_OPP = { sg: 'pl', pl: 'sg', i: 'sg' };
+    const HG_PEOPLE_OBJ = ['freckles', 'glasses', 'dark hair', 'fair hair', 'short hair',
+        'long hair', 'curly hair', 'straight hair'];
+    const HG_PEOPLE_PAIRS = [['short hair', 'long hair'], ['curly hair', 'straight hair'],
+        ['dark hair', 'fair hair']];
+    const HG_ANIMAL_OBJ = ['a long tail', 'a short tail', 'big ears', 'small ears', 'long legs', 'short legs'];
+    const HG_ANIMAL_PAIRS = [['a long tail', 'a short tail'], ['big ears', 'small ears'],
+        ['long legs', 'short legs']];
+    const HG_SUBJECTS = [
+        { s: 'I', mid: 'I', n: 'i', pro: true, short: null },
+        { s: 'You', mid: 'you', n: 'pl', pro: true, short: 'I', shortN: 'i' },
+        { s: 'We', mid: 'we', n: 'pl', pro: true, short: null },
+        { s: 'They', mid: 'they', n: 'pl', pro: true, short: 'they' },
+        { s: 'He', mid: 'he', n: 'sg', pro: true, short: 'he' },
+        { s: 'She', mid: 'she', n: 'sg', pro: true, short: 'she' },
+        { s: 'It', mid: 'it', n: 'sg', pro: true, short: 'it', objs: HG_ANIMAL_OBJ, pairs: HG_ANIMAL_PAIRS },
+        { s: 'Jane', mid: 'Jane', n: 'sg', short: 'she' },
+        { s: 'Tom', mid: 'Tom', n: 'sg', short: 'he' },
+        { s: 'My friend Anna', mid: 'my friend Anna', n: 'sg', short: 'she' },
+        { s: 'My brother', mid: 'my brother', n: 'sg', short: 'he' },
+        { s: 'Grandpa', mid: 'Grandpa', n: 'sg', short: 'he' },
+        { s: 'My dog', mid: 'my dog', n: 'sg', short: 'it', objs: HG_ANIMAL_OBJ, pairs: HG_ANIMAL_PAIRS },
+        { s: 'The elephant', mid: 'the elephant', n: 'sg', short: 'it',
+          objs: ['big ears', 'a long trunk', 'four legs', 'a short tail'], pairs: [] },
+        { s: 'The monkey', mid: 'the monkey', n: 'sg', short: 'it',
+          objs: ['a long tail', 'long arms', 'small ears'], pairs: [] },
+        { s: 'Tom and Ben', mid: 'Tom and Ben', n: 'pl', short: 'they' },
+        { s: 'My cousins', mid: 'my cousins', n: 'pl', short: 'they' },
+        { s: 'Jane and Lucy', mid: 'Jane and Lucy', n: 'pl', short: 'they' },
+        { s: 'My friends', mid: 'my friends', n: 'pl', short: 'they' },
+    ];
+    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+    function haveGotQuestion() {
+        const sub = pickOne(HG_SUBJECTS);
+        const F = HG_FORMS[sub.n];
+        const O = HG_FORMS[HG_OPP[sub.n]];
+        const objs = sub.objs || HG_PEOPLE_OBJ;
+        const pairs = sub.pairs || HG_PEOPLE_PAIRS;
+        const kinds = ['full'];
+        if (sub.n !== 'i') kinds.push('aux', 'aux');
+        if (sub.pro) kinds.push('contr');
+        if (pairs.length) kinds.push('neg', 'neg');
+        if (sub.short) kinds.push('short', 'short', 'what');
+        const kind = pickOne(kinds);
+        const o = pickOne(objs);
+        const base = { hint: 'Elige la palabra que falta ✏️', keypadClass: 'u1' };
+        const key = (extra) => `hg-${kind}-${sub.s}-${extra}`;
+
+        if (kind === 'full') {
+            return u1Question(Object.assign(base, { key: key(o), text: `${sub.s} ___ got ${o}.` }),
+                F.has, [O.has, F.be, O.be]);
+        }
+        if (kind === 'contr') {
+            return u1Question(Object.assign(base, { key: key(o), text: `${sub.s}___ got ${o}.` }),
+                F.c, ["'s", "'ve", "'re", "'m"].filter((x) => x !== F.c));
+        }
+        if (kind === 'neg') {
+            const pair = shuffle(pickOne(pairs).slice());
+            const first = sub.pro ? `${sub.s}${F.c} got ${pair[0]}.` : `${sub.s} ${F.has} got ${pair[0]}.`;
+            const again = sub.pro ? sub.s : cap(sub.short);
+            return u1Question(Object.assign(base, {
+                key: key(pair.join('/')),
+                text: `${first} ${again} ___ got ${pair[1]}.`,
+            }), F.hasnt, [O.hasnt, F.bent, F.dont]);
+        }
+        if (kind === 'aux') {
+            return u1Question(Object.assign(base, { key: key(o), text: `___ ${sub.mid} got ${o}?` }),
+                F.Aux, [O.Aux, cap(F.be), cap(F.do)]);
+        }
+        const S = HG_FORMS[sub.shortN || sub.n];
+        const SO = HG_FORMS[HG_OPP[sub.shortN || sub.n]];
+        if (kind === 'short') {
+            const yes = Math.random() < 0.5;
+            return u1Question(Object.assign(base, {
+                key: key(o + yes),
+                text: `${F.Aux} ${sub.mid} got ${o}?`,
+                clue: `${yes ? 'Yes' : 'No'}, ${sub.short} ___.`,
+            }), yes ? S.has : S.hasnt, yes ? [SO.has, S.be, S.do] : [SO.hasnt, S.bent, S.dont]);
+        }
+        return u1Question(Object.assign(base, {
+            key: key(o),
+            text: `What ___ ${sub.mid} look like?`,
+            clue: `${cap(sub.short)}${S.c} got ${o}.`,
+        }), F.do, [O.do, F.be, F.has]);
+    }
+
+    // --- Me too / Me neither ---
+    const METOO_STATEMENTS = (() => {
+        const out = [];
+        ['freckles', 'glasses', 'curly hair', 'straight hair', 'long hair', 'short hair', 'dark hair',
+            'fair hair', 'a dog', 'a cat', 'a bike', 'a sister', 'a brother'].forEach((x) => {
+            out.push([`I've got ${x}.`, true], [`I haven't got ${x}.`, false]);
+        });
+        ['tall', 'short', 'strong', 'brave', 'fast', 'funny', 'young', 'happy', 'hungry', 'tired']
+            .forEach((x) => { out.push([`I'm ${x}.`, true], [`I'm not ${x}.`, false]); });
+        ['swim', 'climb', 'run fast', 'ride a bike', 'sing', 'dance', 'skate', 'play football']
+            .forEach((x) => { out.push([`I can ${x}.`, true], [`I can't ${x}.`, false]); });
+        ['mangoes', 'bananas', 'ice cream', 'football', 'cats', 'dogs']
+            .forEach((x) => { out.push([`I like ${x}.`, true], [`I don't like ${x}.`, false]); });
+        return out;
+    })();
+
+    // --- Superlatives ---
+    const SUPER_ADJ = [
+        { a: 'tall', es: 'alto', esSup: 'el más alto', comp: 'taller', sup: 'the tallest',
+          supBad: ['the taller', 'the most tall', 'the tallst', 'the talest'], compBad: ['more tall', 'taler', 'tallest'] },
+        { a: 'short', es: 'bajo', esSup: 'el más bajo', comp: 'shorter', sup: 'the shortest',
+          supBad: ['the shorter', 'the most short', 'the shortst', 'the shorttest'], compBad: ['more short', 'shortter', 'shortest'] },
+        { a: 'brave', es: 'valiente', esSup: 'el más valiente', comp: 'braver', sup: 'the bravest',
+          supBad: ['the braver', 'the most brave', 'the braveest', 'the bravst'], compBad: ['more brave', 'braveer', 'bravest'] },
+        { a: 'strong', es: 'fuerte', esSup: 'el más fuerte', comp: 'stronger', sup: 'the strongest',
+          supBad: ['the stronger', 'the most strong', 'the strongst', 'the stronggest'], compBad: ['more strong', 'strongger', 'strongest'] },
+        { a: 'young', es: 'joven', esSup: 'el más joven', comp: 'younger', sup: 'the youngest',
+          supBad: ['the younger', 'the most young', 'the youngst', 'the yungest'], compBad: ['more young', 'youngr', 'youngest'] },
+        { a: 'old', es: 'viejo / mayor', esSup: 'el mayor (el más viejo)', comp: 'older', sup: 'the oldest',
+          supBad: ['the older', 'the most old', 'the oldst', 'the olddest'], compBad: ['more old', 'oldder', 'oldest'] },
+        { a: 'fast', es: 'rápido', esSup: 'el más rápido', comp: 'faster', sup: 'the fastest',
+          supBad: ['the faster', 'the most fast', 'the fastst', 'the fasttest'], compBad: ['more fast', 'fastter', 'fastest'] },
+        { a: 'funny', es: 'gracioso', esSup: 'el más gracioso', comp: 'funnier', sup: 'the funniest',
+          supBad: ['the funnier', 'the most funny', 'the funnyest', 'the funyest'], compBad: ['more funny', 'funnyer', 'funniest'] },
+        { a: 'big', es: 'grande', esSup: 'el más grande', comp: 'bigger', sup: 'the biggest',
+          supBad: ['the bigger', 'the most big', 'the bigest', 'the biggst'], compBad: ['more big', 'biger', 'biggest'] },
+        { a: 'small', es: 'pequeño', esSup: 'el más pequeño', comp: 'smaller', sup: 'the smallest',
+          supBad: ['the smaller', 'the most small', 'the smalest', 'the smallst'], compBad: ['more small', 'smaler', 'smallest'] },
+        { a: 'good', es: 'bueno', esSup: 'el mejor', comp: 'better', sup: 'the best',
+          supBad: ['the better', 'the goodest', 'the most good', 'the bestest'], compBad: ['gooder', 'more good', 'best'] },
+    ];
+    const SUPER_NAMES = ['Ben', 'Jane', 'Tom', 'Lucy', 'Sam', 'Anna', 'Max', 'Emma'];
+    const SUPER_PLACES = ['in the class', 'in my family', 'in the team'];
+    const SUPER_GOOD = ['player in the team', 'singer in the class', 'swimmer in the class'];
+    const SUPER_EXTRA = [
+        ['The giraffe is ___ (tall) animal in the zoo.', 'tall'],
+        ['The elephant is ___ (big) animal in the zoo.', 'big'],
+        ['The elephant is ___ (strong) animal in the zoo.', 'strong'],
+        ['The mouse is ___ (small) animal in the house.', 'small'],
+        ['The clown is ___ (funny) person in the circus.', 'funny'],
+        ['The lion is ___ (brave) animal in the jungle.', 'brave'],
+        ['The cheetah is ___ (fast) animal on land.', 'fast'],
+        ['Grandpa is ___ (old) person in my family.', 'old'],
+        ['The baby is ___ (young) person in my family.', 'young'],
+        ['My mum is ___ (good) cook in the world.', 'good'],
+    ];
+    const SUPER_SONG = [
+        ["Who's tall? Who's short? We don't ___!", 'care', ['cry', 'swim', 'climb']],
+        ["Who's brave? Who's fast? We're all ___!", 'different', ['the same', 'angry', 'the tallest']],
+        ["We're all different! We're all ___!", 'friends', ['angry', 'monkeys', 'the same']],
+    ];
+    // Datos para "Who's the ...?": menor valor gana en "shortest", "youngest" y "fastest" (segundos).
+    const SUPER_DATA = [
+        { sup: 'tallest', unit: 'cm', min: 118, max: 150, highWins: true },
+        { sup: 'shortest', unit: 'cm', min: 118, max: 150, highWins: false },
+        { sup: 'oldest', unit: 'years old', min: 7, max: 12, highWins: true },
+        { sup: 'youngest', unit: 'years old', min: 7, max: 12, highWins: false },
+        { sup: 'fastest', unit: 'seconds', min: 9, max: 20, highWins: false, hint: 'Mira los datos 🔍 (menos segundos = más rápido)' },
+    ];
+    const findAdj = (a) => SUPER_ADJ.find((x) => x.a === a);
+
+    function superQuestion() {
+        const r = Math.random();
+        const base = { keypadClass: 'u1' };
+        if (r < 0.2) {
+            const A = pickOne(SUPER_ADJ);
+            return u1Question(Object.assign(base, {
+                key: `sup-arrow-${A.a}`,
+                hint: 'Superlativo: el / la más…',
+                text: `${A.a} ➜ ___`,
+            }), A.sup, shuffle(A.supBad.slice()).slice(0, 3));
+        }
+        if (r < 0.45) {
+            let text;
+            let A;
+            if (Math.random() < 0.3) {
+                const e = pickOne(SUPER_EXTRA);
+                text = e[0];
+                A = findAdj(e[1]);
+            } else {
+                A = pickOne(SUPER_ADJ);
+                const name = pickOne(SUPER_NAMES);
+                text = A.a === 'good'
+                    ? `${name} is ___ (good) ${pickOne(SUPER_GOOD)}.`
+                    : `${name} is ___ (${A.a}) ${pickOne(SUPER_PLACES)}.`;
+            }
+            return u1Question(Object.assign(base, {
+                key: `sup-sent-${text}`,
+                hint: 'Completa con el superlativo',
+                text,
+            }), A.sup, shuffle(A.supBad.slice()).slice(0, 3));
+        }
+        if (r < 0.6) {
+            const A = pickOne(SUPER_ADJ);
+            if (Math.random() < 0.6) {
+                return u1Question(Object.assign(base, {
+                    key: `sup-row3-${A.a}`, hint: 'Completa la serie', text: `${A.a} – ${A.comp} – ___`,
+                }), A.sup, shuffle(A.supBad.slice()).slice(0, 3));
+            }
+            return u1Question(Object.assign(base, {
+                key: `sup-row2-${A.a}`, hint: 'Completa la serie', text: `${A.a} – ___ – ${A.sup}`,
+            }), A.comp, A.compBad);
+        }
+        if (r < 0.8) {
+            const A = pickOne(SUPER_ADJ);
+            const others = shuffle(SUPER_ADJ.filter((x) => x !== A)).slice(0, 3);
+            const mode = pickOne(['es-en', 'es-en', 'en-es', 'sup']);
+            if (mode === 'es-en') {
+                return u1Question(Object.assign(base, {
+                    key: `sup-tr-es-${A.a}`, hint: '¿Cómo se dice en inglés?', text: A.es,
+                }), A.a, others.map((x) => x.a));
+            }
+            if (mode === 'en-es') {
+                return u1Question(Object.assign(base, {
+                    key: `sup-tr-en-${A.a}`, hint: '¿Qué significa en castellano?', text: A.a,
+                }), A.es, others.map((x) => x.es));
+            }
+            return u1Question(Object.assign(base, {
+                key: `sup-tr-sup-${A.a}`, hint: '¿Cómo se dice en inglés?', text: A.esSup,
+            }), A.sup, others.map((x) => x.sup));
+        }
+        if (r < 0.95) {
+            const D = pickOne(SUPER_DATA);
+            const names = shuffle(SUPER_NAMES.slice()).slice(0, 3);
+            const vals = [];
+            while (vals.length < 3) {
+                const v = D.min + Math.floor(Math.random() * (D.max - D.min + 1));
+                if (!vals.includes(v)) vals.push(v);
+            }
+            const target = D.highWins ? Math.max(...vals) : Math.min(...vals);
+            const winner = names[vals.indexOf(target)];
+            return u1Question(Object.assign(base, {
+                key: `sup-data-${D.sup}-${names.join()}-${vals.join()}`,
+                hint: D.hint || 'Mira los datos 🔍',
+                text: `Who's the ${D.sup}?`,
+                clue: names.map((n, i) => `${n}: ${vals[i]} ${D.unit}`).join(' · '),
+            }), winner, names.filter((n) => n !== winner));
+        }
+        const s = pickOne(SUPER_SONG);
+        return u1Question(Object.assign(base, {
+            key: `sup-song-${s[1]}`, hint: '🎵 Completa la canción', text: s[0],
+        }), s[1], s[2]);
+    }
+
+    // --- Story: Monkey and Elephant ---
+    const STORY_WHO = {
+        Monkey: { label: '🐒 Monkey', value: 'Monkey' },
+        Elephant: { label: '🐘 Elephant', value: 'Elephant' },
+        Owl: { label: '🦉 Owl', value: 'Owl' },
+        Both: { label: '🐒🐘 Monkey and Elephant', value: 'Both' },
+    };
+    const STORY_WHO_ITEMS = [
+        ['___ is fast.', 'Monkey'],
+        ['___ is strong.', 'Elephant'],
+        ['___ can climb.', 'Monkey'],
+        ["___ can't climb.", 'Elephant'],
+        ['___ can swim.', 'Elephant'],
+        ["___ can't swim.", 'Monkey'],
+        ['___ has got an idea.', 'Owl'],
+        ['___ says: "Stop!"', 'Owl'],
+        ['___ climbs and helps Elephant.', 'Monkey'],
+        ['___ swims and helps Monkey.', 'Elephant'],
+        ['___ says: "You\'re different, but you\'re a team!"', 'Owl'],
+        ['___ want the mango.', 'Both'],
+        ['___ are angry at first.', 'Both'],
+        ['___ learn a lesson.', 'Both'],
+        ['___ are a good team.', 'Both'],
+    ];
+    const STORY_TF = [
+        ['Monkey is fast.', true],
+        ['Elephant is strong.', true],
+        ['Monkey can climb.', true],
+        ['Monkey can swim.', false],
+        ["Monkey can't swim.", true],
+        ["Monkey can't climb.", false],
+        ['Elephant can swim.', true],
+        ['Elephant can climb.', false],
+        ["Elephant can't climb.", true],
+        ["Elephant can't swim.", false],
+        ['Owl has got an idea.', true],
+        ['Monkey has got an idea.', false],
+        ['They want the mango.', true],
+        ['They want a banana.', false],
+        ['Monkey and Elephant are angry at first.', true],
+        ['Monkey and Elephant are angry at the end.', false],
+        ['Monkey and Elephant are a good team.', true],
+        ['Monkey and Elephant get the mango.', true],
+        ["Monkey and Elephant don't get the mango.", false],
+        ['Monkey helps Elephant.', true],
+        ['Elephant helps Monkey.', true],
+        ['Owl climbs and helps Elephant.', false],
+        ['Monkey and Elephant are the same.', false],
+        ['Monkey and Elephant are different.', true],
+        ['Monkey and Elephant learn a lesson.', true],
+    ];
+    const STORY_SEQ = [
+        'Two friends are angry.',
+        'Monkey and Elephant go and get the mango.',
+        'Elephant swims and helps Monkey.',
+        'Monkey climbs and helps Elephant.',
+        'Monkey and Elephant learn a lesson.',
+    ];
+    const STORY_THINK = [
+        ['Why are Monkey and Elephant a good team?', 'Because they help each other.',
+            ['Because they are the same.', 'Because they are angry.', "Because they can't swim."]],
+        ['What does Owl say?', "You're different, but you're a team!",
+            ["You're the same, so you're a team!", "You're angry. Go away!", "You can't get the mango!"]],
+        ['What do Monkey and Elephant want?', '🥭 The mango.',
+            ['🍌 A banana.', '🍎 An apple.', '🍓 A strawberry.']],
+        ['Why does Monkey need Elephant?', "Because Monkey can't swim.",
+            ["Because Monkey can't climb.", 'Because Monkey is angry.', 'Because Monkey is strong.']],
+        ['Why does Elephant need Monkey?', "Because Elephant can't climb.",
+            ["Because Elephant can't swim.", 'Because Elephant is fast.', 'Because Elephant is small.']],
+        ['What do Monkey and Elephant say at the end?', "Yes! We're a good team!",
+            ["We're the same!", 'Go away!', "We can't get the mango!"]],
+    ];
+
+    function storyQuestion() {
+        const r = Math.random();
+        if (r < 0.3) {
+            const [text, who] = pickOne(STORY_WHO_ITEMS);
+            return u1Question({
+                key: `story-who-${text}`, hint: '¿Quién es? 🤔', text, keypadClass: 'u1',
+            }, STORY_WHO[who], Object.keys(STORY_WHO).filter((k) => k !== who).map((k) => STORY_WHO[k]));
+        }
+        if (r < 0.65) {
+            const [text, truth] = pickOne(STORY_TF);
+            const T = { label: '✅ True', value: 'true' };
+            const F = { label: '❌ False', value: 'false' };
+            return u1Question({
+                key: `story-tf-${text}`, hint: '¿Verdadero (True) o falso (False)?', text, keypadClass: 'u1-two',
+            }, truth ? T : F, [truth ? F : T]);
+        }
+        if (r < 0.85) {
+            const mode = pickOne(['next', 'next', 'before', 'first', 'last']);
+            let i;
+            let answer;
+            let text;
+            let clue = '';
+            if (mode === 'next') {
+                i = Math.floor(Math.random() * 4);
+                answer = STORY_SEQ[i + 1];
+                text = 'What happens next?';
+                clue = STORY_SEQ[i];
+            } else if (mode === 'before') {
+                i = 1 + Math.floor(Math.random() * 4);
+                answer = STORY_SEQ[i - 1];
+                text = 'What happens before?';
+                clue = STORY_SEQ[i];
+            } else {
+                i = mode === 'first' ? 0 : 4;
+                answer = STORY_SEQ[i];
+                text = mode === 'first' ? 'What happens first?' : 'What happens at the end?';
+            }
+            const wrong = shuffle(STORY_SEQ.filter((s) => s !== answer && s !== clue)).slice(0, 3);
+            return u1Question({
+                key: `story-seq-${mode}-${i}`, hint: '📖 El orden de la historia', text, clue, keypadClass: 'u1-wide',
+            }, answer, wrong);
+        }
+        const [text, answer, wrong] = pickOne(STORY_THINK);
+        return u1Question({
+            key: `story-think-${text}`, hint: '🤔 Piensa en la historia', text, keypadClass: 'u1-wide',
+        }, answer, wrong);
+    }
+
+    const U1_MIX_GAMES = ['u1pelo', 'u1havegot', 'u1metoo', 'u1super', 'u1story'];
+
     // === Catálogo de juegos ===
     const GAMES = {
         sumas: {
@@ -732,6 +1365,104 @@
             },
             formatAnswer(q) { return q.result; },
         },
+
+        u1pelo: {
+            id: 'u1pelo',
+            title: 'Hair and faces',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'u1',
+            generate(prev) {
+                return noRepeat(() => {
+                    const r = Math.random();
+                    if (r < 0.2) return peloVocab();
+                    const face = randomFace();
+                    const p = pickOne(U1_PRONS);
+                    return r < 0.6 ? peloDescribe(face, p) : peloYesNo(face, p);
+                }, prev);
+            },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        u1havegot: {
+            id: 'u1havegot',
+            title: 'Has / Have got',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'u1',
+            generate(prev) { return noRepeat(haveGotQuestion, prev); },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        u1metoo: {
+            id: 'u1metoo',
+            title: 'Me too / Me neither',
+            total: 30,
+            timeLimit: 150,
+            keypadClass: 'u1-two',
+            generate(prev) {
+                return noRepeat(() => {
+                    const [text, positive] = pickOne(METOO_STATEMENTS);
+                    return u1Question({
+                        key: `metoo-${text}`,
+                        hint: 'Responde que a ti también te pasa 👍',
+                        text,
+                        keypadClass: 'u1-two',
+                    }, positive ? 'Me too!' : 'Me neither!', [positive ? 'Me neither!' : 'Me too!']);
+                }, prev);
+            },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        u1super: {
+            id: 'u1super',
+            title: 'The tallest!',
+            total: 25,
+            timeLimit: 150,
+            keypadClass: 'u1',
+            generate(prev) { return noRepeat(superQuestion, prev); },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        u1story: {
+            id: 'u1story',
+            title: 'Monkey & Elephant',
+            total: 20,
+            timeLimit: 150,
+            keypadClass: 'u1',
+            generate(prev) { return noRepeat(storyQuestion, prev); },
+            renderQuestion: u1Render,
+            getKeypadValues: u1Keypad,
+            formatAnswer: u1Answer,
+        },
+
+        // Repaso: cada pregunta recuerda en "sub" qué juego la generó y se delega en él.
+        u1mix: {
+            id: 'u1mix',
+            title: 'Repaso Unit 1',
+            total: 30,
+            timeLimit: 180,
+            keypadClass: 'u1',
+            generate(prev) {
+                const sub = pickOne(U1_MIX_GAMES);
+                const game = GAMES[sub];
+                const q = game.generate(prev && prev.sub === sub ? prev : null);
+                q.sub = sub;
+                if (!q.keypadClass) q.keypadClass = game.keypadClass;
+                return q;
+            },
+            renderQuestion(q, container, picks) { GAMES[q.sub].renderQuestion(q, container, picks); },
+            getKeypadValues(q) { return GAMES[q.sub].getKeypadValues(q); },
+            formatAnswer(q) { return GAMES[q.sub].formatAnswer(q); },
+        },
     };
 
     function range(from, to) {
@@ -784,7 +1515,7 @@
     function buildKeypad(game, question) {
         const keypad = $('keypad');
         keypad.innerHTML = '';
-        keypad.className = 'keypad ' + (game.keypadClass || '');
+        keypad.className = 'keypad ' + ((question && question.keypadClass) || game.keypadClass || '');
         const values = game.getKeypadValues(question);
         values.forEach((v) => {
             const btn = document.createElement('button');

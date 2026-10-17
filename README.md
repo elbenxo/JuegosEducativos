@@ -12,6 +12,17 @@ Reto: resolver **60 sumas en menos de 2 minutos**.
 - Mensaje de felicitación al lograrlo o de ánimo si no se consigue.
 - El niño introduce su nombre antes de empezar.
 
+## Inglés – Unit 1: Our friends (examen)
+
+Seis juegos para preparar el examen de la Unit 1 (4º primaria), cada uno con un banco grande de preguntas generadas al azar:
+
+- **Hair and faces** — describe la cara del dibujo (pelo, gafas, pecas) y vocabulario.
+- **Has / Have got** — has/have, 's/'ve, hasn't/haven't, preguntas y respuestas cortas.
+- **Me too / Me neither** — contesta que a ti también te pasa.
+- **The tallest!** — superlativos (tall → the tallest, big → the biggest, good → the best) y adjetivos.
+- **Monkey & Elephant** — comprensión de la historia.
+- **Repaso Unit 1** — todo mezclado, 30 preguntas en 3 minutos.
+
 ## Cómo jugarlo
 
 Es una web estática, sin dependencias. Para abrirla en local:

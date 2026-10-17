@@ -506,6 +506,72 @@ html, body {
 }
 
 
+/* === Unit 1 "Our friends" === */
+.u1-hint {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #777;
+}
+.u1-faces {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+.u1-face {
+    width: 140px;
+    height: auto;
+    background: #f0f8ff;
+    border-radius: 18px;
+}
+.u1-faces.two .u1-face { width: 120px; }
+
+.keypad.u1,
+.keypad.u1-two,
+.keypad.u1-wide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 540px;
+    gap: 12px;
+}
+.keypad.u1-wide { grid-template-columns: minmax(0, 1fr); }
+.keypad.u1 .key,
+.keypad.u1-two .key,
+.keypad.u1-wide .key {
+    min-width: 0;
+    padding: 16px 10px;
+    font-size: clamp(1.1rem, 4vw, 1.5rem);
+    line-height: 1.2;
+    background: linear-gradient(135deg, #c8f2e6 0%, #4fc3a1 100%);
+    color: var(--text);
+    box-shadow: 0 5px 0 #2e8b72;
+    overflow-wrap: break-word;
+}
+.keypad.u1-two .key {
+    padding: 24px 10px;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+}
+.keypad.u1-wide .key {
+    padding: 14px 12px;
+    font-size: clamp(1.05rem, 3.6vw, 1.35rem);
+}
+.keypad.u1 .key:hover,
+.keypad.u1-two .key:hover,
+.keypad.u1-wide .key:hover {
+    background: linear-gradient(135deg, #b4ecdc 0%, #3fb592 100%);
+}
+.feedback {
+    max-width: 94%;
+    width: max-content;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 0 10px;
+}
+@media (max-width: 480px) {
+    .u1-face { width: 112px; }
+    .u1-faces.two .u1-face { width: 100px; }
+    .keypad.u1-wide .key { padding: 11px 10px; }
+}
+
 /* === Resultado === */
 .result-card .title { font-size: clamp(3rem, 9vw, 5rem); }
 .result-message {
