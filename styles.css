@@ -756,3 +756,16 @@ html, body {
     .key { padding: 14px 0; font-size: 1.3rem; }
     .stat { min-width: 90px; padding: 12px 16px; }
 }
+
+/* Al fallar: la respuesta correcta en verde y la pulsada en rojo */
+.keypad .key.key-right {
+    background: linear-gradient(135deg, #b8f5c8 0%, #2ecc71 100%) !important;
+    color: #0b4d24 !important;
+    box-shadow: 0 0 0 4px #2ecc71;
+    transform: scale(1.04);
+}
+.keypad .key.key-wrong {
+    background: linear-gradient(135deg, #ffc9c9 0%, #e74c3c 100%) !important;
+    color: #fff !important;
+    opacity: 0.85;
+}
