@@ -15,20 +15,20 @@ Web estática de juegos educativos para niños, con seis minijuegos contra reloj
 
 Sección aparte **"📘 Inglés – Unit 1: Our friends (examen)"** (4º primaria, libro de texto, Unit 1):
 
-- **Hair and faces** (`u1pelo`, 25 en 2:30): cara SVG generada (pelo dark/fair, short/long, curly/straight, gafas, pecas); "What does she look like?", "Has he got glasses?" y vocabulario es↔en.
-- **Has / Have got** (`u1havegot`, 25 en 2:30): huecos has/have, 's/'ve, hasn't/haven't, Has/Have…?, short answers, What does/do … look like?
-- **Me too / Me neither** (`u1metoo`, 30 en 2:30): responder que a ti también te pasa.
-- **The tallest!** (`u1super`, 25 en 2:30): superlativos, serie tall–taller–the tallest, adjetivos es↔en, "Who's the tallest?" con datos, canción.
-- **Monkey & Elephant** (`u1story`, 20 en 2:30): comprensión de la historia (quién, True/False, orden, por qué).
-- **What's the link?** (`u1link`, 20 en 2:30): 3 caras con nombre que comparten exactamente dos rasgos; elegir la pareja ("curly hair / freckles").
-- **Guess who!** (`u1guess`, 20 en 2:30): 4 caras con nombre y 1–3 pistas ("She's got dark hair. She hasn't got glasses."); botones "Is it Ella?". Sólo una cara cumple todas.
-- **True or false?** (`u1truefalse`, 30 en 2:30): cara(s) + frase con 's got / hasn't got / 've got / haven't got (también "I've got…"), ~50 % verdaderas.
-- **Line up!** (`u1lineup`, 25 en 2:30): 3–4 niños con barras (cm, años, segundos, kg); "Who's the tallest/…?" o "Ben is ___." (superlativo).
-- **Order the sentence** (`u1order`, 15 en 3:00, multi-pick): tocar las palabras en orden (254 frases de la unidad).
-- **Spell it!** (`u1spell`, 30 en 2:30): elegir la palabra bien escrita (45 palabras, con cara para las de pelo).
-- **Story order** (`u1seq`, 15 en 3:00): ordenar 5 o 3 eventos de la historia (multi-pick), "Which happens first/last?", "A or B?" y next/before.
-- **Repaso Unit 1** (`u1mix`, 30 en 3:00): mezcla aleatoria de todos los juegos u1 de respuesta única.
-- **Examen Unit 1** (`u1exam`, 40 en 5:00): simulacro con todos los juegos u1, incluidos los multi-pick.
+- **Hair and faces** (`u1pelo`, 25 en 4:00): cara SVG generada (pelo dark/fair, short/long, curly/straight, gafas, pecas); "What does she look like?", "Has he got glasses?" y vocabulario es↔en.
+- **Has / Have got** (`u1havegot`, 25 en 4:00): huecos has/have, 's/'ve, hasn't/haven't, Has/Have…?, short answers, What does/do … look like?
+- **Me too / Me neither** (`u1metoo`, 30 en 4:00): responder que a ti también te pasa.
+- **The tallest!** (`u1super`, 25 en 4:00): superlativos, serie tall–taller–the tallest, adjetivos es↔en, "Who's the tallest?" con datos, canción.
+- **Monkey & Elephant** (`u1story`, 20 en 4:00): comprensión de la historia (quién, True/False, orden, por qué).
+- **What's the link?** (`u1link`, 20 en 4:00): 3 caras con nombre que comparten exactamente dos rasgos; elegir la pareja ("curly hair / freckles").
+- **Guess who!** (`u1guess`, 20 en 4:00): 4 caras con nombre y 1–3 pistas ("She's got dark hair. She hasn't got glasses."); botones "Is it Ella?". Sólo una cara cumple todas.
+- **True or false?** (`u1truefalse`, 30 en 4:00): cara(s) + frase con 's got / hasn't got / 've got / haven't got (también "I've got…"), ~50 % verdaderas.
+- **Line up!** (`u1lineup`, 25 en 4:00): 3–4 niños con barras (cm, años, segundos, kg); "Who's the tallest/…?" o "Ben is ___." (superlativo).
+- **Order the sentence** (`u1order`, 15 en 5:00, multi-pick): tocar las palabras en orden (254 frases de la unidad).
+- **Spell it!** (`u1spell`, 30 en 4:00): elegir la palabra bien escrita (45 palabras, con cara para las de pelo).
+- **Story order** (`u1seq`, 15 en 5:00): ordenar 5 o 3 eventos de la historia (multi-pick), "Which happens first/last?", "A or B?" y next/before.
+- **Repaso Unit 1** (`u1mix`, 30 en 5:00): mezcla aleatoria de todos los juegos u1 de respuesta única.
+- **Examen Unit 1** (`u1exam`, 40 en 8:00): simulacro con todos los juegos u1, incluidos los multi-pick.
 
 Sin dependencias, sin build. Tres archivos: `index.html`, `styles.css`, `script.js`.
 
@@ -79,7 +79,7 @@ El bucle común (`nextQuestion`, `onAnswer`, `endGame`, etc.) es agnóstico al j
 
 ## Reglas de UX (no negociables)
 
-- **Es un juego contra reloj**: feedback corto. Acertar avanza en ~400 ms; fallar muestra la respuesta correcta unos ~450 ms y pasa a la siguiente. Nunca permitir reintentar la misma pregunta (evita el ensayo-error sin pensar).
+- **Es un juego contra reloj**: feedback corto. Acertar avanza en ~400 ms; fallar muestra la respuesta correcta ~2,5 s (en el feedback y marcando en verde el botón correcto y en rojo el pulsado) y pasa a la siguiente; el reloj se para mientras se muestra el feedback. Nunca permitir reintentar la misma pregunta (evita el ensayo-error sin pensar).
 - **Una pulsación = una respuesta**. Cada botón del teclado es una respuesta completa, no un dígito a acumular.
 - **Diseño infantil**: botones grandes, fuente Comic Sans / Trebuchet, colores vivos, animaciones suaves.
 - **El nombre se conserva** entre partidas hasta que el jugador pulsa "Cambiar jugador".
