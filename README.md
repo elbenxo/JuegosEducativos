@@ -28,8 +28,8 @@ Juegos para preparar el examen de la Unit 1 (4º primaria), cada uno con un banc
 - **Order the sentence** — toca las palabras en orden para formar la frase.
 - **Spell it!** — elige la palabra bien escrita.
 - **Story order** — ordena la historia de Monkey y Elephant.
-- **Repaso Unit 1** — todo mezclado, 30 preguntas en 5 minutos.
-- **Examen Unit 1** — simulacro de 40 preguntas en 8 minutos con todos los juegos.
+- **Repaso Unit 1** — todo mezclado, 30 preguntas en 7 minutos.
+- **Examen Unit 1** — simulacro de 40 preguntas en 12 minutos con todos los juegos.
 
 ## Cómo jugarlo
 
