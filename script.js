@@ -1854,7 +1854,7 @@
             id: 'u1pelo',
             title: 'Hair and faces',
             total: 25,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1',
             generate(prev) {
                 return noRepeat(() => {
@@ -1874,7 +1874,7 @@
             id: 'u1havegot',
             title: 'Has / Have got',
             total: 25,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1',
             generate(prev) { return noRepeat(haveGotQuestion, prev); },
             renderQuestion: u1Render,
@@ -1886,7 +1886,7 @@
             id: 'u1metoo',
             title: 'Me too / Me neither',
             total: 30,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1-two',
             generate(prev) {
                 return noRepeat(() => {
@@ -1908,7 +1908,7 @@
             id: 'u1super',
             title: 'The tallest!',
             total: 25,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1',
             generate(prev) { return noRepeat(superQuestion, prev); },
             renderQuestion: u1Render,
@@ -1920,7 +1920,7 @@
             id: 'u1story',
             title: 'Monkey & Elephant',
             total: 20,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1',
             generate(prev) { return noRepeat(storyQuestion, prev); },
             renderQuestion: u1Render,
@@ -1932,7 +1932,7 @@
             id: 'u1link',
             title: "What's the link?",
             total: 20,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1',
             generate(prev) { return noRepeat(linkQuestion, prev); },
             renderQuestion: u1Render,
@@ -1944,7 +1944,7 @@
             id: 'u1guess',
             title: 'Guess who!',
             total: 20,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1',
             generate(prev) { return noRepeat(guessQuestion, prev); },
             renderQuestion: u1Render,
@@ -1956,7 +1956,7 @@
             id: 'u1truefalse',
             title: 'True or false?',
             total: 30,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1-two',
             generate(prev) { return noRepeat(trueFalseQuestion, prev); },
             renderQuestion: u1Render,
@@ -1968,7 +1968,7 @@
             id: 'u1lineup',
             title: 'Line up!',
             total: 25,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1',
             generate(prev) { return noRepeat(lineupQuestion, prev); },
             renderQuestion: u1Render,
@@ -1980,7 +1980,7 @@
             id: 'u1order',
             title: 'Order the sentence',
             total: 15,
-            timeLimit: 300,
+            timeLimit: 420,
             keypadClass: 'words',
             generate(prev) { return noRepeat(orderQuestion, prev); },
             renderQuestion: orderRender,
@@ -1992,7 +1992,7 @@
             id: 'u1spell',
             title: 'Spell it!',
             total: 30,
-            timeLimit: 240,
+            timeLimit: 360,
             keypadClass: 'u1',
             generate(prev) { return noRepeat(spellQuestion, prev); },
             renderQuestion: u1Render,
@@ -2004,7 +2004,7 @@
             id: 'u1seq',
             title: 'Story order',
             total: 15,
-            timeLimit: 300,
+            timeLimit: 420,
             keypadClass: 'u1-wide',
             generate(prev) { return noRepeat(seqQuestion, prev); },
             renderQuestion: seqRender,
@@ -2015,8 +2015,8 @@
             },
         },
 
-        u1mix: u1MixGame('u1mix', 'Repaso Unit 1', 30, 300, U1_MIX_GAMES),
-        u1exam: u1MixGame('u1exam', 'Examen Unit 1', 40, 480, U1_EXAM_GAMES),
+        u1mix: u1MixGame('u1mix', 'Repaso Unit 1', 30, 420, U1_MIX_GAMES),
+        u1exam: u1MixGame('u1exam', 'Examen Unit 1', 40, 720, U1_EXAM_GAMES),
     };
 
     function range(from, to) {
@@ -2177,7 +2177,7 @@
     // Tras fallar se deja ver la solución con calma: el reloj se para mientras
     // se muestra el feedback para que leerla no cueste tiempo.
     const DELAY_OK = 400;
-    const DELAY_WRONG = 2500;
+    const DELAY_WRONG = 4000;
 
     function finishCheck(correct) {
         state.locked = true;
